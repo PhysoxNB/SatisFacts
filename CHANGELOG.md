@@ -17,7 +17,7 @@ How to use this file:
 
 ## [Unreleased]
 
-## [1.0.0] - 2026-06-24
+## [1.0.0] - 2026-06-28
 
 First public release.
 
