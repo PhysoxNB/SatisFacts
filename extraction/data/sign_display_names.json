@@ -1,0 +1,12 @@
+{
+  "Build_StandaloneWidgetSign_Small_C": "Label Sign (2 m)",
+  "Build_StandaloneWidgetSign_SmallVeryWide_C": "Label Sign (4 m)",
+  "Build_StandaloneWidgetSign_SmallWide_C": "Label Sign (3 m)",
+  "Build_StandaloneWidgetSign_Square_Tiny_C": "Square Sign (0.5 m)",
+  "Build_StandaloneWidgetSign_Medium_C": "Display Sign",
+  "Build_StandaloneWidgetSign_Square_C": "Square Sign (2 m)",
+  "Build_StandaloneWidgetSign_Square_Small_C": "Square Sign (1 m)",
+  "Build_StandaloneWidgetSign_Portrait_C": "Portrait Sign",
+  "Build_StandaloneWidgetSign_Huge_C": "Large Billboard",
+  "Build_StandaloneWidgetSign_Large_C": "Small Billboard"
+}

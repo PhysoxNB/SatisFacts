@@ -1,0 +1,26 @@
+{
+  "MinerMk1": {
+    "base_rate": 60,
+    "purity_multiplier": {
+      "impure": 0.5,
+      "normal": 1.0,
+      "pure": 2.0
+    }
+  },
+  "MinerMk2": {
+    "base_rate": 120,
+    "purity_multiplier": {
+      "impure": 0.5,
+      "normal": 1.0,
+      "pure": 2.0
+    }
+  },
+  "MinerMk3": {
+    "base_rate": 240,
+    "purity_multiplier": {
+      "impure": 0.5,
+      "normal": 1.0,
+      "pure": 2.0
+    }
+  }
+}

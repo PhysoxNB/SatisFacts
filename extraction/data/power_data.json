@@ -1,0 +1,112 @@
+{
+  "generators": {
+    "BiomassBurner": {
+      "base_mw": 30,
+      "overclockable": true,
+      "clock_speed_formula": "linear",
+      "fuel_types": ["Biomass", "Solid Biofuel", "Leaves", "Wood", "Mycelia", "Alien Remains", "Fabric"]
+    },
+    "CoalGenerator": {
+      "base_mw": 75,
+      "overclockable": true,
+      "clock_speed_formula": "linear",
+      "fuel_types": ["Coal", "Compacted Coal"]
+    },
+    "FuelGenerator": {
+      "base_mw": 250,
+      "overclockable": true,
+      "clock_speed_formula": "linear",
+      "fuel_types": ["Fuel", "Turbofuel", "Liquid Biofuel"]
+    },
+    "GeothermalGenerator": {
+      "base_mw": {
+        "impure": 100,
+        "normal": 200,
+        "pure": 400
+      },
+      "overclockable": false,
+      "clock_speed_formula": "none",
+      "fuel_types": ["Geyser"]
+    },
+    "NuclearPowerPlant": {
+      "base_mw": 2500,
+      "overclockable": true,
+      "clock_speed_formula": "linear",
+      "fuel_types": ["Uranium Fuel Rod", "Plutonium Fuel Rod", "Ficsonium Fuel Rod"]
+    },
+    "AlienPowerPlant": {
+      "base_mw": 500,
+      "overclockable": false,
+      "clock_speed_formula": "none",
+      "fuel_types": ["Somersloop"]
+    }
+  },
+  "consumers": {
+    "MinerMk1": {
+      "base_mw": 4
+    },
+    "MinerMk2": {
+      "base_mw": 15
+    },
+    "MinerMk3": {
+      "base_mw": 45
+    },
+    "Smelter": {
+      "base_mw": 4
+    },
+    "Constructor": {
+      "base_mw": 4
+    },
+    "Assembler": {
+      "base_mw": 15
+    },
+    "Manufacturer": {
+      "base_mw": 55
+    },
+    "Refinery": {
+      "base_mw": 30
+    },
+    "Blender": {
+      "base_mw": 75
+    },
+    "Foundry": {
+      "base_mw": 16
+    },
+    "Packager": {
+      "base_mw": 10
+    },
+    "HadronCollider": {
+      "base_mw": 500,
+      "note": "Variable: 250-750 MW (diamonds/plutonium), 500-1500 MW (dark matter/ficsonium/nuclear pasta)"
+    },
+    "QuantumEncoder": {
+      "base_mw": 500,
+      "note": "Variable: 0-2000 MW depending on recipe"
+    },
+    "Converter": {
+      "base_mw": 100,
+      "note": "Variable: 100-400 MW depending on recipe"
+    },
+    "WaterPump": {
+      "base_mw": 20
+    },
+    "OilExtractor": {
+      "base_mw": 40
+    },
+    "ResourceWellPressurizer": {
+      "base_mw": 150
+    },
+    "ResourceWellExtractor": {
+      "base_mw": 0
+    }
+  },
+  "power_storage": {
+    "capacity_mwh": 100,
+    "max_charge_rate_mw": 100
+  },
+  "clock_speed_formulas": {
+    "production": "power = initial * (clock_speed/100)^1.321928",
+    "generator": "power = initial * (clock_speed/100)",
+    "consumer": "power = initial * (clock_speed/100)^1.321928"
+  }
+}

@@ -1,0 +1,1838 @@
+{
+  "Persistent_Level:PersistentLevel.BP_ResourceNode481": {
+    "type": "bauxite",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode635": {
+    "type": "bauxite",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode477": {
+    "type": "bauxite",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode566": {
+    "type": "bauxite",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode636": {
+    "type": "bauxite",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode529": {
+    "type": "bauxite",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode476": {
+    "type": "bauxite",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode480": {
+    "type": "bauxite",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode486": {
+    "type": "bauxite",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode597": {
+    "type": "bauxite",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode633": {
+    "type": "bauxite",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode479": {
+    "type": "bauxite",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode568": {
+    "type": "bauxite",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode596": {
+    "type": "bauxite",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode485": {
+    "type": "bauxite",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode634": {
+    "type": "bauxite",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode595": {
+    "type": "bauxite",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode142_UAID_40B076DF2F79E8DD01_2087440367": {
+    "type": "caterium",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode134_8590": {
+    "type": "caterium",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode574": {
+    "type": "caterium",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode142_UAID_40B076DF2F79E9DD01_1872254547": {
+    "type": "caterium",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode487_UAID_40B076DF2F7934DF01_1597642799": {
+    "type": "caterium",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode121_UAID_40B076DF2F7938DF01_2097772508": {
+    "type": "caterium",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode487": {
+    "type": "caterium",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode142": {
+    "type": "caterium",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode169_UAID_40B076DF2F7939DE01_2083925623": {
+    "type": "caterium",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode176_UAID_40B076DF2F793BDF01_1694110039": {
+    "type": "caterium",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode570": {
+    "type": "caterium",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode142_UAID_40B076DF2F79E9DD01_1434900545": {
+    "type": "caterium",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode140": {
+    "type": "caterium",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode70_3132": {
+    "type": "caterium",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode240": {
+    "type": "caterium",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode72_998": {
+    "type": "caterium",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode121_4877": {
+    "type": "caterium",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode620": {
+    "type": "coal",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode604": {
+    "type": "coal",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode611": {
+    "type": "coal",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode622": {
+    "type": "coal",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode621": {
+    "type": "coal",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode573_UAID_40B076DF2F7981E001_1464253430": {
+    "type": "coal",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode573_UAID_40B076DF2F797DE001_1807610722": {
+    "type": "coal",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode573_UAID_40B076DF2F7974E101_1439035199": {
+    "type": "coal",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode573_UAID_40B076DF2F7984E001_1384492965": {
+    "type": "coal",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode573_UAID_40B076DF2F795EE801_1339162695": {
+    "type": "coal",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode573_UAID_40B076DF2F7973E101_1125437021": {
+    "type": "coal",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode573_UAID_40B076DF2F7984E001_1664435967": {
+    "type": "coal",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode573_UAID_40B076DF2F7980E001_1705275252": {
+    "type": "coal",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode573_UAID_40B076DF2F7971E101_2069219665": {
+    "type": "coal",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode612": {
+    "type": "coal",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode504": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode560": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode617": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode503": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode573_UAID_40B076DF2F796FE101_1569477308": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode615": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode6_379": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode616": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode502": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode606": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode7_380": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode559": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode500": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode501": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode618": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode573_UAID_40B076DF2F7983E001_1088885785": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode619": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode603": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode573_UAID_40B076DF2F7974E101_1674467201": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode5_381": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode573_UAID_40B076DF2F79ACE101_1257410031": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode498": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode602": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode609": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode581": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode594": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode601": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode451": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode499": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode600": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode122": {
+    "type": "coal",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode605": {
+    "type": "coal",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode614": {
+    "type": "coal",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode469": {
+    "type": "coal",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode452": {
+    "type": "coal",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode599": {
+    "type": "coal",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode587": {
+    "type": "coal",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode_700": {
+    "type": "coal",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode573_UAID_40B076DF2F7972E101_1083579843": {
+    "type": "coal",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode610": {
+    "type": "coal",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode573_UAID_40B076DF2F7983E001_1840982787": {
+    "type": "coal",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode449": {
+    "type": "coal",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode129": {
+    "type": "coal",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode573_UAID_40B076DF2F796BE101_1963012602": {
+    "type": "coal",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode590": {
+    "type": "coal",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode130": {
+    "type": "coal",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode623": {
+    "type": "coal",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode_C_UAID_40B076DF2F794DE201_1841969367": {
+    "type": "copper",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode493": {
+    "type": "copper",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode492": {
+    "type": "copper",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode131": {
+    "type": "copper",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode188": {
+    "type": "copper",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode75_6425": {
+    "type": "copper",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode214": {
+    "type": "copper",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode_C_UAID_40B076DF2F794FE201_2126930721": {
+    "type": "copper",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode83_UAID_40B076DF2F79FFE101_1122581639": {
+    "type": "copper",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode212": {
+    "type": "copper",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode562": {
+    "type": "copper",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode237": {
+    "type": "copper",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode83_UAID_40B076DF2F79FBE101_1618730935": {
+    "type": "copper",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode202": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode162_5199": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode150": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode215": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode38_902": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode185": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode506": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode194": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode125_5930": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode540": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode68_2514": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode127": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode197": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode159": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode547_UAID_40B076DF2F79AEE101_1979010387": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode112": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode94_406": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode192_0": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode505": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode593": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode156": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode91_785": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode92": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode141": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode195": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode507": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode211": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode111_3367": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode547": {
+    "type": "copper",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode117": {
+    "type": "copper",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode179": {
+    "type": "copper",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode_C_UAID_A036BCACDEB0A6A601_2086848673": {
+    "type": "copper",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode53_510": {
+    "type": "copper",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode515": {
+    "type": "copper",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode513": {
+    "type": "copper",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode547_UAID_40B076DF2F79ADE101_1836911209": {
+    "type": "copper",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode83": {
+    "type": "copper",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode213": {
+    "type": "copper",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode216": {
+    "type": "copper",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode445": {
+    "type": "copper",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode514": {
+    "type": "copper",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode235": {
+    "type": "copper",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode13": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode577": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode578": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode542": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode49": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode462_UAID_40B076DF2F7907E201_1624182051": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode592": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode488": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode569": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode173": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode221": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode563_UAID_40B076DF2F79B9E101_1570060334": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode580": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode541": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode494": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode532": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode535": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode491": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode563_UAID_40B076DF2F79BBE101_1434258671": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode530": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode539": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode12_91": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode200": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode462_UAID_40B076DF2F790CE201_2008279933": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode536": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode489": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode531": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode533": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode490": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode184": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode579": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode538": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode563_UAID_40B076DF2F79B7E101_1869159978": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode222": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode204_0": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode495": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode563_UAID_40B076DF2F79B8E101_1620414156": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode591": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode537": {
+    "type": "iron",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode105_2463": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode233": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode199": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode148": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode36": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode551": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode205": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode147": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode66": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode223": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode35": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode128_5242": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode168": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode558": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode208": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode236": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode496": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode108": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode218": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode546": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode149": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode167": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode230": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode544": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode153": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode545": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode106": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode73_6071": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode74": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode198": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode206": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode462_UAID_40B076DF2F7902E201_1630060169": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode497_1": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode528": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode543": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode90_482": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode146": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode524_UAID_40B076DF2F798ADF01_1172524943": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode109": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode107": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode523_UAID_40B076DF2F7987DF01_1117795413": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode585": {
+    "type": "iron",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode517": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode207": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode95_579": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode175": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode76": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode196": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode65_1865": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode430": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode39": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode454": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode116": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode180": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode55_1215": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode114": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode82": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode217": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode126_6409": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode161": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode174": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode201": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode435_26": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode583_1": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode427": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode40": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode115": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode563": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode453": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode209": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode437_30": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode565_8": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode160": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode239": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode567": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode123_5084": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode81": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode210": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode431": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode238": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode462": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode220": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode203": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode426": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode518": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode80": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode457": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode219": {
+    "type": "iron",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode555": {
+    "type": "limestone",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode556": {
+    "type": "limestone",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode193": {
+    "type": "limestone",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode224": {
+    "type": "limestone",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode464_UAID_40B076DF2F790EE201_1850696287": {
+    "type": "limestone",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode464_UAID_40B076DF2F7914E201_2026233335": {
+    "type": "limestone",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode557": {
+    "type": "limestone",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode534": {
+    "type": "limestone",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode181": {
+    "type": "limestone",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode589_UAID_40B076DF2F79B1E101_1767545917": {
+    "type": "limestone",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode182": {
+    "type": "limestone",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode191": {
+    "type": "limestone",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode586": {
+    "type": "limestone",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode226": {
+    "type": "limestone",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode553": {
+    "type": "limestone",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode465": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode549": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode59_755": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode124_5785": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode464_UAID_40B076DF2F790FE201_1577140465": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode187_0": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode158": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode443": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode97_1": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode550": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode157": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode41_1099": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode189": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode139_909": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode104": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode509": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode133_6963": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode441": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode186": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode178": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode554": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode132_5908": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode145_1749": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode584": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode144_1644": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode521_UAID_40B076DF2F79C3E101_1735462083": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode102_2068": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode439_1": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode138_590": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode103": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode77": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode511": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode42_1294": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode96_886": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode464_UAID_40B076DF2F7915E201_1334543513": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode589": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode67_2193": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode548": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode60_984": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode466": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode143_1543": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode512": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode228": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode118_4340": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode46_2284": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode119": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode521_UAID_40B076DF2F79C3E101_1100698081": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode442": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode229": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode37_178": {
+    "type": "limestone",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode589_UAID_40B076DF2F79B2E101_1298360096": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode85": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode166": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode464": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode227": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode11": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode54_833": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode516": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode110": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode225": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode165": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode575": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode93_5": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode564": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode508": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode20_3137": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode113": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode561": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode190": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode84": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode69_UAID_A036BCACDEB0A7A601_1261875850": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode571": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode521": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode62": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode234": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode164": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode463": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode163": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode440": {
+    "type": "limestone",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode25_98": {
+    "type": "oil",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode16": {
+    "type": "oil",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode98": {
+    "type": "oil",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode446_1": {
+    "type": "oil",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode447": {
+    "type": "oil",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode15": {
+    "type": "oil",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode24_97": {
+    "type": "oil",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode23_96": {
+    "type": "oil",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode32_105": {
+    "type": "oil",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode31_104": {
+    "type": "oil",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode459": {
+    "type": "oil",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode100": {
+    "type": "oil",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode448": {
+    "type": "oil",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode14_609": {
+    "type": "oil",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode29_102": {
+    "type": "oil",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode458": {
+    "type": "oil",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode88": {
+    "type": "oil",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode444_0": {
+    "type": "oil",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode30_103": {
+    "type": "oil",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode28_101": {
+    "type": "oil",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode151": {
+    "type": "oil",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode86": {
+    "type": "oil",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode152_995": {
+    "type": "oil",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode87": {
+    "type": "oil",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode460": {
+    "type": "oil",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode26_99": {
+    "type": "oil",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode154": {
+    "type": "oil",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode27_100": {
+    "type": "oil",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode89": {
+    "type": "oil",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode155": {
+    "type": "oil",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode57_UAID_40B076DF2F7935DF01_1413169977": {
+    "type": "quartz",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode57_UAID_40B076DF2F7991DF01_1459615180": {
+    "type": "quartz",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode136_UAID_40B076DF2F7975DF01_1617269241": {
+    "type": "quartz",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode137_2248": {
+    "type": "quartz",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode231": {
+    "type": "quartz",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode474_UAID_40B076DF2F7983DF01_2128950703": {
+    "type": "quartz",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode136_UAID_40B076DF2F7975DF01_1622351243": {
+    "type": "quartz",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode552": {
+    "type": "quartz",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode232": {
+    "type": "quartz",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode474_UAID_40B076DF2F798EDF01_2134364650": {
+    "type": "quartz",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode522": {
+    "type": "quartz",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode588": {
+    "type": "quartz",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode136_UAID_40B076DF2F7975DF01_1587576239": {
+    "type": "quartz",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode588_UAID_40B076DF2F79CEDF01_1910960903": {
+    "type": "quartz",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode474_UAID_40B076DF2F798DDF01_1645035472": {
+    "type": "quartz",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode136": {
+    "type": "quartz",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode520": {
+    "type": "quartz",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode99": {
+    "type": "sam",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode43_UAID_40B076DF2F793ED901_1532454233": {
+    "type": "sam",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode43_UAID_40B076DF2F7936D401_1733397541": {
+    "type": "sam",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode172_UAID_40B076DF2F79DFD901_1471130569": {
+    "type": "sam",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode43_UAID_40B076DF2F7932D901_1711042113": {
+    "type": "sam",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode241_UAID_40B076DF2F7947D301_1723440520": {
+    "type": "sam",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode607": {
+    "type": "sam",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode101_UAID_40B076DF2F79E6D901_1551800812": {
+    "type": "sam",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode43_UAID_40B076DF2F7941D901_1404601764": {
+    "type": "sam",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode101_1893": {
+    "type": "sam",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode519_UAID_40B076DF2F79D3D901_1586151453": {
+    "type": "sam",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode47_3066": {
+    "type": "sam",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode241": {
+    "type": "sam",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode78_1097": {
+    "type": "sam",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode172": {
+    "type": "sam",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode135": {
+    "type": "sam",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode101_UAID_40B076DF2F79E7D901_2125168992": {
+    "type": "sam",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode519": {
+    "type": "sam",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode43": {
+    "type": "sam",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode71_UAID_40B076DF2F7925DB01_1453678949": {
+    "type": "sulfur",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode582": {
+    "type": "sulfur",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode170_363": {
+    "type": "sulfur",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode177": {
+    "type": "sulfur",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode510": {
+    "type": "sulfur",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode461": {
+    "type": "sulfur",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode467": {
+    "type": "sulfur",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode71_UAID_40B076DF2F7929DB01_1177072656": {
+    "type": "sulfur",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode613": {
+    "type": "sulfur",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode71_736": {
+    "type": "sulfur",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode71_UAID_40B076DF2F79B9DB01_1490254983": {
+    "type": "sulfur",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode624": {
+    "type": "sulfur",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode71_UAID_40B076DF2F797CDB01_1695622247": {
+    "type": "sulfur",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode71_UAID_40B076DF2F7924DB01_1576108771": {
+    "type": "sulfur",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode71_UAID_40B076DF2F7912DC01_2042985647": {
+    "type": "sulfur",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode71_UAID_40B076DF2F7923DB01_2085455593": {
+    "type": "sulfur",
+    "purity": "pure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode632": {
+    "type": "uranium",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode484_UAID_40B076DF2F79E0DF01_2091429101": {
+    "type": "uranium",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode484": {
+    "type": "uranium",
+    "purity": "impure"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode598_0": {
+    "type": "uranium",
+    "purity": "normal"
+  },
+  "Persistent_Level:PersistentLevel.BP_ResourceNode576": {
+    "type": "uranium",
+    "purity": "normal"
+  }
+}

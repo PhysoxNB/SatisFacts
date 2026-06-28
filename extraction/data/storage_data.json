@@ -1,0 +1,54 @@
+{
+  "containers": {
+    "StorageContainer": {
+      "slots": 24,
+      "inputs": 1,
+      "outputs": 1
+    },
+    "StorageContainer_Mk2": {
+      "slots": 48,
+      "inputs": 1,
+      "outputs": 1
+    },
+    "IndustrialStorageContainer": {
+      "slots": 48,
+      "inputs": 2,
+      "outputs": 2
+    },
+    "IndustrialTank": {
+      "slots": 36000,
+      "inputs": 1,
+      "outputs": 1
+    },
+    "CentralStorage": {
+      "slots": 1,
+      "inputs": 1,
+      "outputs": 1
+    },
+    "StorageIntegrated": {
+      "slots": 48,
+      "inputs": 1,
+      "outputs": 1
+    }
+  },
+  "dimensional_depot": {
+    "base_stacks_per_item": 1,
+    "max_stacks_per_item": 5,
+    "base_upload_speed": 15,
+    "max_upload_speed": 240,
+    "upgrade_costs": {
+      "upload_speed": [
+        {"speed": 30, "mercer_spheres": 3, "sam_fluctuators": 47},
+        {"speed": 60, "mercer_spheres": 7, "sam_fluctuators": 103},
+        {"speed": 120, "mercer_spheres": 13, "sam_fluctuators": 151},
+        {"speed": 240, "mercer_spheres": 23, "sam_fluctuators": 199}
+      ],
+      "stack_capacity": [
+        {"stacks": 2, "mercer_spheres": 3, "sam_fluctuators": 47},
+        {"stacks": 3, "mercer_spheres": 7, "sam_fluctuators": 103},
+        {"stacks": 4, "mercer_spheres": 13, "sam_fluctuators": 151},
+        {"stacks": 5, "mercer_spheres": 23, "sam_fluctuators": 199}
+      ]
+    }
+  }
+}
