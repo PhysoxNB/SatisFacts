@@ -17,6 +17,12 @@ How to use this file:
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-06-29
+
+### Fixed
+- MAM research tree progress now includes the FICSMAS XMas tree (13 nodes).
+- FICSMAS bonus research nodes in other trees no longer inflate completed counts beyond the in-game tree total.
+
 ## [1.0.0] - 2026-06-28
 
 First public release.
@@ -35,5 +41,6 @@ First public release.
 ### Changed
 - Peak memory reduced by ~60% on large saves via streaming extraction and compact fact retention.
 
-[Unreleased]: https://github.com/PhysoxNB/SatisFacts/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/PhysoxNB/SatisFacts/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/PhysoxNB/SatisFacts/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/PhysoxNB/SatisFacts/releases/tag/v1.0.0

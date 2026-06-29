@@ -1076,6 +1076,7 @@ func calculateGameProgressionAnalytics(input AnalyticsInput) map[string]interfac
 		"Alien Technology":    19,
 		"Flower Petals":       11,
 		"Alien Organisms":     11,
+		"XMas":                13,
 	}
 	if isV12OrLater {
 		treeTotals["Caterium"] = 17
@@ -1093,6 +1094,7 @@ func calculateGameProgressionAnalytics(input AnalyticsInput) map[string]interfac
 		"Flower Petals":       {"Research_FlowerPetals_", "Research_FlowerPetal_"},
 		"Alien Organisms":     {"Research_AO_", "Research_ACarapace_", "Research_AOrganisms_", "Research_AOrgans_"},
 		"Alien Technology":    {"Research_Alien_"},
+		"XMas":                {"Research_XMas_"},
 	}
 
 	// crossListed maps schematics whose prefix suggests one tree but actually
@@ -1126,6 +1128,11 @@ func calculateGameProgressionAnalytics(input AnalyticsInput) map[string]interfac
 					break
 				}
 			}
+		}
+		// Cap completed at total — FICSMAS event adds bonus research nodes
+		// to existing trees that don't count toward the tree's total in-game.
+		if total > 0 && completed > total {
+			completed = total
 		}
 		percentage := 0
 		if total > 0 {
