@@ -17,6 +17,21 @@ How to use this file:
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-03
+
+### Added
+- Interactive mode: unified prompt accepts a file number or a folder path directly.
+- Save file list in interactive mode is now sorted by date modified (newest first).
+- Modification date displayed alongside each save file in the interactive list.
+- Environment variables in folder paths are expanded (e.g. `%LOCALAPPDATA%` on Windows).
+- Direct `.sav` file paths can be pasted at the prompt to process immediately.
+
+### Changed
+- Output files (`.json` and `.html`) are now written next to the executable instead of next to the save file, keeping the save folder clean.
+- Console UI widened and aligned to support 3-digit save indices (100+ saves).
+- All console border lines now use consistent cyan coloring.
+- "No saves found" message is centered in the console box.
+
 ## [1.0.1] - 2026-06-29
 
 ### Fixed
@@ -41,6 +56,7 @@ First public release.
 ### Changed
 - Peak memory reduced by ~60% on large saves via streaming extraction and compact fact retention.
 
-[Unreleased]: https://github.com/PhysoxNB/SatisFacts/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/PhysoxNB/SatisFacts/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/PhysoxNB/SatisFacts/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/PhysoxNB/SatisFacts/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/PhysoxNB/SatisFacts/releases/tag/v1.0.0

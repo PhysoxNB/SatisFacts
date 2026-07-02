@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -17,7 +18,7 @@ import (
 )
 
 // release version, shown by --version
-const version = "1.0.1"
+const version = "1.1.0"
 
 // Shared buffered reader for all console input. Using one reader avoids
 // bufio swallowing bytes that a separate os.Stdin.Read never sees (Git Bash,
@@ -91,73 +92,109 @@ func runInteractive() {
 
 	printBanner()
 
-	// Grab the .sav files in the current folder.
-	entries, err := os.ReadDir(".")
-	if err != nil {
-		printErrorf("reading directory: %v", err)
-		pauseExit(1)
-	}
+	scanDir := "."
 
-	var savFiles []string
-	for _, e := range entries {
-		if !e.IsDir() && strings.HasSuffix(strings.ToLower(e.Name()), ".sav") {
-			savFiles = append(savFiles, e.Name())
-		}
-	}
-
-	if len(savFiles) == 0 {
-		printStep("No .sav files found in current directory.")
-		printStep("Place this executable in your save folder and run again.")
-		pauseExit(1)
-	}
-
-	// Show what we found.
-	printSectionHeader("Save files found")
-	for i, f := range savFiles {
-		if info, err := os.Stat(f); err == nil {
-			name := f
-			if len(name) > 31 {
-				name = name[:28] + "..."
-			}
-			fmt.Printf("│  %s. %-31s %s%s\n",
-				wrap(cBold, fmt.Sprintf("%d", i+1)),
-				name,
-				wrap(cDim, fmt.Sprintf("%8s", fmt.Sprintf("%.1f MB", float64(info.Size())/1024/1024))),
-				wrap(cCyan, "│"))
-		} else {
-			fmt.Printf("│  %s. %-31s %8s%s\n",
-				wrap(cBold, fmt.Sprintf("%d", i+1)),
-				f,
-				"",
-				wrap(cCyan, "│"))
-		}
-	}
-	printSectionFooter()
-
-	// Ask which file. Re-prompt on bad input, 'q' quits.
-	var saveFile string
 	for {
-		fmt.Print("\n")
-		fmt.Printf("%s ", wrap(cYellow, "Select file number (or 'q' to quit):"))
-		fileInput, err := reader.ReadString('\n')
-		line := strings.TrimSpace(fileInput)
-		if line == "" && err != nil {
-			// stdin closed (EOF), nothing left to read so just leave.
-			return
-		}
-		if strings.EqualFold(line, "q") {
-			return
-		}
-		fileIdx, convErr := strconv.Atoi(line)
-		if convErr != nil || fileIdx < 1 || fileIdx > len(savFiles) {
-			printWarnf("Invalid selection. Enter a number between 1 and %d.", len(savFiles))
-			continue
-		}
-		saveFile = savFiles[fileIdx-1]
-		break
-	}
+		savFiles := scanSavFiles(scanDir)
 
-	// Ask for the mode, same re-prompt loop.
+		if len(savFiles) == 0 {
+			msg := "No .sav files found in current directory."
+			if scanDir != "." {
+				msg = "No .sav files found in specified directory."
+			}
+			// Center the message in the 64-char inner box.
+			pad := (64 - len(msg)) / 2
+			if pad < 0 {
+				pad = 0
+			}
+			rightPad := 64 - len(msg) - pad
+			fmt.Printf("%s%s%s%s%s\n",
+				wrap(cCyan, "│"),
+				strings.Repeat(" ", pad),
+				msg,
+				strings.Repeat(" ", rightPad),
+				wrap(cCyan, "│"))
+			printSectionFooter()
+		} else {
+			printSectionHeader("Save files found")
+
+			for i, sf := range savFiles {
+				name := sf.Name
+				if len(name) > 30 {
+					name = name[:27] + "..."
+				}
+				dateStr := sf.ModTime.Format("Jan 02 15:04")
+				fmt.Printf("%s  %s. %-30s  %s  %s  %s\n",
+					wrap(cCyan, "│"),
+					wrap(cBold, fmt.Sprintf("%3d", i+1)),
+					name,
+					wrap(cDim, fmt.Sprintf("%8s", fmt.Sprintf("%.1f MB", float64(sf.Size)/1024/1024))),
+					wrap(cDim, fmt.Sprintf("%13s", dateStr)),
+					wrap(cCyan, "│"))
+			}
+			printSectionFooter()
+		}
+
+		// Unified prompt: accept a file number or a folder path.
+		promptText := "Select file number (or 'q' to quit)"
+		if len(savFiles) == 0 {
+			promptText = "Enter a path (or 'q' to quit)"
+		}
+		for {
+			fmt.Print("\n")
+			fmt.Printf("%s ", wrap(cYellow, promptText+":"))
+			input, err := reader.ReadString('\n')
+			line := strings.TrimSpace(input)
+			if line == "" && err != nil {
+				return
+			}
+			if strings.EqualFold(line, "q") {
+				return
+			}
+			if line == "" {
+				printWarn("Enter a file number or a folder path.")
+				continue
+			}
+
+			// Try to parse as a number first.
+			if fileIdx, convErr := strconv.Atoi(line); convErr == nil {
+				if fileIdx >= 1 && fileIdx <= len(savFiles) {
+					saveFile := filepath.Join(scanDir, savFiles[fileIdx-1].Name)
+					runModePrompt(reader, saveFile)
+					return
+				}
+				if len(savFiles) == 0 {
+					printWarn("No saves to select. Enter a folder path instead.")
+				} else {
+					printWarnf("Invalid selection. Enter a number between 1 and %d, or a folder path.", len(savFiles))
+				}
+				continue
+			}
+
+			// Not a number — try as a folder path.
+			expanded := os.ExpandEnv(line)
+			info, statErr := os.Stat(expanded)
+			if statErr != nil {
+				printWarnf("Not a valid number or path: %v", statErr)
+				continue
+			}
+			if !info.IsDir() {
+				// It's a file — if it's a .sav, process it directly.
+				if strings.HasSuffix(strings.ToLower(expanded), ".sav") {
+					runModePrompt(reader, expanded)
+					return
+				}
+				printWarn("Path is a file but not a .sav file.")
+				continue
+			}
+			scanDir = expanded
+			break // re-scan the new directory
+		}
+	}
+}
+
+// runModePrompt asks the user for QUICK or DEEP mode, then runs processSave.
+func runModePrompt(reader *bufio.Reader, saveFile string) {
 	printSectionHeader("Extraction modes")
 	printMenuItem(1, "QUICK", "Basic counts (fastest)")
 	printRecommended(2, "DEEP", "Full analysis")
@@ -194,12 +231,51 @@ func runInteractive() {
 	pauseExit(0)
 }
 
+// savEntry holds a .sav file name along with its size and modification time
+// for display and sorting in the interactive picker.
+type savEntry struct {
+	Name    string
+	Size    int64
+	ModTime time.Time
+}
+
+// scanSavFiles reads dir, collects .sav files, and returns them sorted by
+// modification time (newest first).
+func scanSavFiles(dir string) []savEntry {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil
+	}
+
+	var savFiles []savEntry
+	for _, e := range entries {
+		if e.IsDir() || !strings.HasSuffix(strings.ToLower(e.Name()), ".sav") {
+			continue
+		}
+		info, err := e.Info()
+		if err != nil {
+			continue
+		}
+		savFiles = append(savFiles, savEntry{
+			Name:    e.Name(),
+			Size:    info.Size(),
+			ModTime: info.ModTime(),
+		})
+	}
+
+	sort.Slice(savFiles, func(i, j int) bool {
+		return savFiles[i].ModTime.After(savFiles[j].ModTime)
+	})
+
+	return savFiles
+}
+
 // printUsage prints command-line help.
 func printUsage() {
 	fmt.Printf(`SatisFacts v%s — Satisfactory Save File Analyzer (by Physox)
 
 Usage:
-  satisfacts                      Interactive mode (scan current folder for .sav files)
+  satisfacts                      Interactive mode (scan current folder, or enter a path)
   satisfacts <save.sav>           Analyze a save (default mode: DEEP)
   satisfacts <save.sav> <MODE>    Analyze with a specific mode
 
@@ -212,7 +288,7 @@ Flags:
   -v, --version   Show version
 
 Output:
-  <save>_<mode>.json and <save>_<mode>.html next to the save file.
+  <save>_<mode>.json and <save>_<mode>.html next to the executable.
 `, version)
 }
 
@@ -350,7 +426,11 @@ func processSave(savePath, mode string) (err error) {
 	printDetailf("Sublevels: %d (total levels: %d)", body.SublevelCount, body.LevelCount)
 
 	// Phase 3: open the JSON output and get ready to stream objects into it.
-	outputPrefix := strings.TrimSuffix(savePath, filepath.Ext(savePath))
+	// Output goes next to the executable (current directory), using just the
+	// save file's base name. This keeps the save folder clean when the user
+	// specifies a remote save path.
+	saveBaseName := filepath.Base(savePath)
+	outputPrefix := strings.TrimSuffix(saveBaseName, filepath.Ext(saveBaseName))
 	modeLower := strings.ToLower(mode)
 	jsonFile := outputPrefix + "_" + modeLower + ".json"
 	printStepf("Streaming to %s ...", jsonFile)

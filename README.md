@@ -20,8 +20,9 @@ Grab a ready-to-use build from the [**Releases**](https://github.com/PhysoxNB/Sa
 
 ### Windows
 1. Download `SatisFacts.exe`.
-2. Put it in the folder with your `.sav` files (or anywhere) and **double-click it**, or drag a save onto it.
-3. Pick a save and a mode when prompted. It writes a `.json` and a `.html` report next to the save — open the `.html` in any browser.
+2. **Double-click it** (or drag a save onto it). You can put it anywhere — no need to place it in your save folder.
+3. If no `.sav` files are found in the current folder, paste your save folder path (e.g. `%LOCALAPPDATA%\FactoryGame\Saved\SaveGames\<your_id>`) at the prompt. Environment variables are supported.
+4. Pick a save by number. Saves are listed newest-first with modification dates. It writes a `.json` and a `.html` report next to the executable — open the `.html` in any browser.
 
 > **Heads-up (Windows SmartScreen / antivirus):** SatisFacts is an open-source,
 > unsigned executable, so Windows Defender SmartScreen may warn "Windows protected
@@ -69,9 +70,13 @@ go build -o satisfacts .
 ```
 
 Running the binary with no arguments starts an interactive mode that scans the
-current directory for `.sav` files and prompts for the file and mode.
+current directory for `.sav` files (sorted newest first with modification dates)
+and prompts for the file and mode. If no saves are found locally, you can enter a
+save folder path directly at the prompt — environment variables like
+`%LOCALAPPDATA%` are expanded automatically.
 
-Output is written to `<savefile>_<mode>.json` and `<savefile>_<mode>.html` (e.g. `Save1.2_deep.html`, `Save1.2_deep.json`).
+Output is written to `<savefile>_<mode>.json` and `<savefile>_<mode>.html` next
+to the executable (e.g. `Save1.2_deep.html`, `Save1.2_deep.json`).
 
 ## Modes
 
