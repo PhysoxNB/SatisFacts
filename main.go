@@ -17,7 +17,7 @@ import (
 )
 
 // release version, shown by --version
-const version = "1.0.0"
+const version = "1.0.1"
 
 // Shared buffered reader for all console input. Using one reader avoids
 // bufio swallowing bytes that a separate os.Stdin.Read never sees (Git Bash,
