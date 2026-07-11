@@ -102,12 +102,12 @@ func runInteractive() {
 			if scanDir != "." {
 				msg = "No .sav files found in specified directory."
 			}
-			// Center the message in the 64-char inner box.
-			pad := (64 - len(msg)) / 2
+			// Center the message in the 88-char inner box.
+			pad := (88 - len(msg)) / 2
 			if pad < 0 {
 				pad = 0
 			}
-			rightPad := 64 - len(msg) - pad
+			rightPad := 88 - len(msg) - pad
 			fmt.Printf("%s%s%s%s%s\n",
 				wrap(cCyan, "│"),
 				strings.Repeat(" ", pad),
@@ -120,11 +120,11 @@ func runInteractive() {
 
 			for i, sf := range savFiles {
 				name := sf.Name
-				if len(name) > 30 {
-					name = name[:27] + "..."
+				if len(name) > 54 {
+					name = name[:51] + "..."
 				}
 				dateStr := sf.ModTime.Format("Jan 02 15:04")
-				fmt.Printf("%s  %s. %-30s  %s  %s  %s\n",
+				fmt.Printf("%s  %s. %-54s  %s  %s  %s\n",
 					wrap(cCyan, "│"),
 					wrap(cBold, fmt.Sprintf("%3d", i+1)),
 					name,
@@ -884,6 +884,16 @@ func processSave(savePath, mode string) (err error) {
 	}
 
 	printSummaryLine("Time:", wrap(cGreen, elapsed.String()))
+	printSectionFooter()
+
+	// Show the user exactly where the output files are (absolute paths).
+	fmt.Println()
+	printSectionHeader("Output files")
+	htmlAbs, _ := filepath.Abs(htmlFile)
+	jsonAbs, _ := filepath.Abs(jsonFile)
+	printDonef("HTML report:  %s", wrap(cBold, htmlAbs))
+	printDonef("JSON data:    %s", wrap(cBold, jsonAbs))
+	printDetail("Open the .html file in any browser to view the report.")
 	printSectionFooter()
 
 	// Force a GC first so the memory numbers reflect what's actually live.

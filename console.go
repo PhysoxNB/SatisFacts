@@ -56,10 +56,10 @@ func wrap(code, text string) string {
 // printBanner prints the SatisFacts ASCII banner in cyan.
 func printBanner() {
 	banner := []string{
-		"╔════════════════════════════════════════════════════════════════╗",
-		"║                     SatisFacts  by Physox                      ║",
-		"║                Satisfactory Save File Analyzer                 ║",
-		"╚════════════════════════════════════════════════════════════════╝",
+		"╔════════════════════════════════════════════════════════════════════════════════════════╗",
+		"║                             SatisFacts  by Physox                                      ║",
+		"║                         Satisfactory Save File Analyzer                                ║",
+		"╚════════════════════════════════════════════════════════════════════════════════════════╝",
 	}
 	for _, line := range banner {
 		fmt.Println(wrap(cCyan, line))
@@ -71,8 +71,8 @@ func printBanner() {
 func printSectionHeader(title string) {
 	prefix := "┌─ " + title + " "
 	// Use rune count, not byte length — box-drawing chars are multi-byte UTF-8.
-	// Footer is └ + 64×─ + ┘ = 66 display chars. Header must match.
-	padding := 65 - utf8.RuneCountInString(prefix)
+	// Footer is └ + 88×─ + ┘ = 90 display chars. Header must match.
+	padding := 89 - utf8.RuneCountInString(prefix)
 	if padding < 0 {
 		padding = 0
 	}
@@ -81,7 +81,7 @@ func printSectionHeader(title string) {
 
 // printSectionFooter prints the └─────┘ closing line in cyan.
 func printSectionFooter() {
-	fmt.Println(wrap(cCyan, "└"+strings.Repeat("─", 64)+"┘"))
+	fmt.Println(wrap(cCyan, "└"+strings.Repeat("─", 88)+"┘"))
 }
 
 // printDone prints a green ✓ line: "│ ✓ message"
