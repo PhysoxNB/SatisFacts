@@ -1003,21 +1003,25 @@ func calculateGameProgressionAnalytics(input AnalyticsInput) map[string]interfac
 	currentPhaseNum := extractPhaseNum(gp.CurrentPhase)
 	targetPhaseNum := extractPhaseNum(gp.TargetPhase)
 
+	// Phases: 0 = pre-SE, 1-5 = SE phases, 6+ = post-game
+	isCompleted := currentPhaseNum >= 5
+
+	// Cap at 5 for post-game saves
 	spaceElevatorPhase := currentPhaseNum
-	if spaceElevatorPhase > 4 {
-		spaceElevatorPhase = 4
+	if spaceElevatorPhase > 5 {
+		spaceElevatorPhase = 5
 	}
-	isCompleted := currentPhaseNum >= 4
+
+	// Post-game: target wraps back to 1
 	targetPhase := targetPhaseNum
-	if targetPhase > 4 {
-		targetPhase = 4
+	if isCompleted && (targetPhase == 0 || targetPhase == 1) {
+		targetPhase = 5
 	}
-	if targetPhase == 0 {
-		if isCompleted {
-			targetPhase = 4
-		} else {
-			targetPhase = 1
-		}
+	if targetPhase > 5 {
+		targetPhase = 5
+	}
+	if targetPhase == 0 && !isCompleted {
+		targetPhase = 1
 	}
 
 	// HUB tier from purchased schematics (X-Y format)
@@ -1179,7 +1183,8 @@ func calculateGameProgressionAnalytics(input AnalyticsInput) map[string]interfac
 		},
 		"awesome_sink": map[string]interface{}{
 			"coupons":      gp.SinkCoupons,
-			"total_points": gp.SinkTotalPoints,
+			"points":       gp.SinkPoints,
+			"dna_points":   gp.SinkDNAPoints,
 		},
 	}
 }

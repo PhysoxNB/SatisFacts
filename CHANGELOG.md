@@ -17,6 +17,25 @@ How to use this file:
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-11
+
+### Added
+- Game Progression section in Overview: Space Elevator phases with completed status, milestone tier progress (X/Y milestones per tier).
+- Starting Location displayed in Save Information.
+- Player Stats in Extras tab: per-player name, inventory slots, visited areas, and played messages (supports multiplayer saves).
+- AWESOME Sink coupons shown in Extras tab.
+- Output file paths (absolute) shown in console after extraction.
+
+### Changed
+- Renamed "Project Assembly" section to "Game Progression".
+- Space Elevator phase display now correctly handles 5 phases (was capped at 4) and shows "Phase 5 (Completed)" for post-game saves.
+- Target Phase card hidden when the game is completed.
+- AWESOME Sink points removed from UI (only coupons shown); point data still in JSON.
+- Console UI widened from 64 to 88 characters to support longer save file names and 3-digit save indices.
+
+### Fixed
+- Space Elevator target phase showed "Phase 1" on completed saves (raw target wraps post-game); now correctly shows completed status.
+
 ## [1.1.0] - 2026-07-03
 
 ### Added
@@ -56,7 +75,8 @@ First public release.
 ### Changed
 - Peak memory reduced by ~60% on large saves via streaming extraction and compact fact retention.
 
-[Unreleased]: https://github.com/PhysoxNB/SatisFacts/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/PhysoxNB/SatisFacts/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/PhysoxNB/SatisFacts/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/PhysoxNB/SatisFacts/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/PhysoxNB/SatisFacts/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/PhysoxNB/SatisFacts/releases/tag/v1.0.0

@@ -160,7 +160,6 @@ The generated HTML report is a self-contained interactive file with:
 
 - **Interactive map** — visual factory layout with building positions, power grid overlay, and resource nodes
 - **Vehicle & drone tracking** — active routes, cargo, fuel status
-- **Player state** — inventory, equipped items, position
 
 ## Special Thanks
 

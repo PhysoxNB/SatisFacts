@@ -27,6 +27,7 @@ type AnalyticsData struct {
 	Drones              map[string]interface{}            `json:"drones"`
 	Vehicles            map[string]interface{}            `json:"vehicles"`
 	GameProgression     map[string]interface{}            `json:"gameProgression"`
+	Players             []PlayerInfo                      `json:"players"`
 	NuclearWaste        map[string]interface{}            `json:"nuclearWaste"`
 }
 
@@ -55,6 +56,7 @@ type AnalyticsInput struct {
 	CollectedCollectibles CollectedCollectiblesData
 	Pickups            []PickupItem
 	GameProgression    GameProgressionData
+	Players            []PlayerInfo
 	SaveVersion        int
 	// Transport data
 	Belts              map[string]*BeltTypeStats
@@ -101,6 +103,7 @@ func CalculateAnalytics(input AnalyticsInput) *AnalyticsData {
 		Drones:              calculateDroneAnalytics(input),
 		Vehicles:            calculateVehicleAnalytics(input),
 		GameProgression:     calculateGameProgressionAnalytics(input),
+		Players:             input.Players,
 		NuclearWaste:        calculateNuclearWasteAnalytics(input),
 	}
 }

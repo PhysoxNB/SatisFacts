@@ -282,7 +282,11 @@ func shouldRetainForPostExtraction(typePath, typeLower string, hasProperties boo
 		strings.Contains(typeLower, "gamestate") ||
 		strings.Contains(typeLower, "phasemanager") ||
 		strings.Contains(typeLower, "schematicmanager") ||
-		strings.Contains(typeLower, "researchmanager") {
+		strings.Contains(typeLower, "researchmanager") ||
+		strings.Contains(typeLower, "tutorialintro") ||
+		strings.Contains(typeLower, "gamemode") ||
+		strings.Contains(typeLower, "char_player") ||
+		strings.Contains(typeLower, "playerstate") {
 		return true
 	}
 
@@ -361,6 +365,15 @@ var essentialPostExtractionProps = map[string]bool{
 	"mPartsCostMultiplier": true,
 	"mSpacePartsCostMultiplier": true,
 	"mPowerConsumptionMultiplier": true,
+	// World info
+	"mTradingPostLevel": true,
+	"mStartingPointTagName": true,
+	// Player info
+	"mCachedPlayerName": true,
+	"mOwnedPawn": true,
+	"mNumObservedInventorySlots": true,
+	"mVisitedAreas": true,
+	"mPlayedMessages": true,
 	// Resource nodes
 	"mPurityOverride": true,
 	"mResourceClassOverride": true,

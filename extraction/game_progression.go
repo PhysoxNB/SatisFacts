@@ -16,7 +16,8 @@ type GameProgressionData struct {
 	ResearchActivated     bool     `json:"researchActivated"`
 	LastUsedHardDriveID   int      `json:"lastUsedHardDriveID"`
 	SinkCoupons           int      `json:"sinkCoupons"`
-	SinkTotalPoints       int      `json:"sinkTotalPoints"`
+	SinkPoints            int      `json:"sinkPoints"`
+	SinkDNAPoints         int      `json:"sinkDNAPoints"`
 
 	// Custom map settings (1.2+, stored in BP_GameState)
 	NodePuritySetting        string  `json:"nodePuritySetting,omitempty"`
@@ -25,6 +26,10 @@ type GameProgressionData struct {
 	PartsCostMultiplier      float32 `json:"partsCostMultiplier,omitempty"`
 	SpacePartsCostMultiplier float32 `json:"spacePartsCostMultiplier,omitempty"`
 	PowerConsumptionMultiplier float32 `json:"powerConsumptionMultiplier,omitempty"`
+
+	// World info
+	TradingPostLevel  int    `json:"tradingPostLevel,omitempty"`
+	StartingLocation  string `json:"startingLocation,omitempty"`
 }
 
 // ExtractGameProgression finds the game state object and reads progression off
@@ -79,22 +84,26 @@ func ExtractGameProgression(retained []*parser.SaveObject, objectMap map[string]
 				if v, ok := GetPropInt32(sinkObj, "mNumResourceSinkCoupons"); ok {
 					gp.SinkCoupons = int(v)
 				}
-				// mCurrentPointLevels is an int array; sum it for the running total.
+				// mCurrentPointLevels: [0] = regular Sink points, [1] = DNA Sink points.
 				if pointLevels, ok := GetPropArray(sinkObj, "mCurrentPointLevels"); ok && pointLevels != nil {
-					total := 0
-					for _, item := range pointLevels {
+					for idx, item := range pointLevels {
+						val := 0
 						switch v := item.(type) {
 						case int32:
-							total += int(v)
+							val = int(v)
 						case float64:
-							total += int(v)
+							val = int(v)
 						case int:
-							total += v
+							val = v
 						case int64:
-							total += int(v)
+							val = int(v)
+						}
+						if idx == 0 {
+							gp.SinkPoints = val
+						} else if idx == 1 {
+							gp.SinkDNAPoints = val
 						}
 					}
-					gp.SinkTotalPoints = total
 				}
 			}
 		}
@@ -120,6 +129,26 @@ func ExtractGameProgression(retained []*parser.SaveObject, objectMap map[string]
 		}
 	}
 
+	// Second pass: TutorialIntroManager (trading post) and BP_GameMode (starting location)
+	for _, obj := range retained {
+		if obj.Header == nil || obj.Properties == nil {
+			continue
+		}
+		typeLower := strings.ToLower(obj.Header.ClassName)
+
+		if strings.Contains(typeLower, "tutorialintro") {
+			if v, ok := GetPropInt32(obj, "mTradingPostLevel"); ok {
+				gp.TradingPostLevel = int(v)
+			}
+		}
+
+		if strings.Contains(typeLower, "gamemode") {
+			if v, ok := GetPropString(obj, "mStartingPointTagName"); ok {
+				gp.StartingLocation = cleanStartingLocation(v)
+			}
+		}
+	}
+
 	return gp
 }
 
@@ -133,6 +162,29 @@ func cleanEnumValue(v string) string {
 	v = strings.TrimPrefix(v, "NPS_")
 	v = strings.TrimPrefix(v, "NRM_")
 	return v
+}
+
+// cleanStartingLocation strips the tag prefix, e.g. "StartingPoint_GrassFields"
+// or "SP_GrassFields" becomes "Grass Fields".
+func cleanStartingLocation(v string) string {
+	v = strings.TrimPrefix(v, "StartingPoint_")
+	v = strings.TrimPrefix(v, "SP_")
+	// Insert spaces before capital letters: "GrassFields" -> "Grass Fields"
+	// but skip if the previous char is already a space or separator.
+	var out strings.Builder
+	for i, r := range v {
+		if i > 0 && r >= 'A' && r <= 'Z' {
+			prev := out.String()
+			if len(prev) > 0 {
+				last := prev[len(prev)-1]
+				if last != ' ' && last != '_' && last != '-' {
+					out.WriteRune(' ')
+				}
+			}
+		}
+		out.WriteRune(r)
+	}
+	return out.String()
 }
 
 func getObjRefProp(obj *parser.SaveObject, propName string) string {
@@ -304,4 +356,72 @@ func getArrayItems(prop parser.Property) []interface{} {
 		return v
 	}
 	return nil
+}
+
+type PlayerInfo struct {
+	Name             string `json:"name"`
+	InventorySlots   int    `json:"inventorySlots"`
+	VisitedAreas     int    `json:"visitedAreas"`
+	PlayedMessages   int    `json:"playedMessages"`
+}
+
+func ExtractPlayerInfo(retained []*parser.SaveObject, objectMap map[string]*parser.SaveObject) []PlayerInfo {
+	// Map Char_Player pathName -> name
+	playerNames := map[string]string{}
+	for _, obj := range retained {
+		if obj.Header == nil || obj.Properties == nil {
+			continue
+		}
+		typeLower := strings.ToLower(obj.Header.ClassName)
+		if !strings.Contains(typeLower, "char_player") {
+			continue
+		}
+		if name, ok := GetPropString(obj, "mCachedPlayerName"); ok && name != "" {
+			playerNames[obj.Header.Reference.PathName] = name
+		}
+	}
+
+	var players []PlayerInfo
+	for _, obj := range retained {
+		if obj.Header == nil || obj.Properties == nil {
+			continue
+		}
+		typeLower := strings.ToLower(obj.Header.ClassName)
+		if !strings.Contains(typeLower, "playerstate") {
+			continue
+		}
+
+		var info PlayerInfo
+
+		// Get name via mOwnedPawn -> Char_Player
+		if pawnRef := getObjRefProp(obj, "mOwnedPawn"); pawnRef != "" {
+			info.Name = playerNames[pawnRef]
+			if info.Name == "" {
+				if pawnObj, ok := objectMap[pawnRef]; ok && pawnObj.Properties != nil {
+					if name, ok := GetPropString(pawnObj, "mCachedPlayerName"); ok {
+						info.Name = name
+					}
+				}
+			}
+		}
+		if info.Name == "" {
+			info.Name = "Unknown"
+		}
+
+		if v, ok := GetPropInt32(obj, "mNumObservedInventorySlots"); ok {
+			info.InventorySlots = int(v)
+		}
+
+		if areas, ok := GetPropArray(obj, "mVisitedAreas"); ok {
+			info.VisitedAreas = len(areas)
+		}
+
+		if msgs, ok := GetPropArray(obj, "mPlayedMessages"); ok {
+			info.PlayedMessages = len(msgs)
+		}
+
+		players = append(players, info)
+	}
+
+	return players
 }

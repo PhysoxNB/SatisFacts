@@ -18,7 +18,7 @@ import (
 )
 
 // release version, shown by --version
-const version = "1.1.0"
+const version = "1.2.0"
 
 // Shared buffered reader for all console input. Using one reader avoids
 // bufio swallowing bytes that a separate os.Stdin.Read never sees (Git Bash,
@@ -583,6 +583,7 @@ func processSave(savePath, mode string) (err error) {
 
 	// Extract game progression
 	gameProgression := extraction.ExtractGameProgression(extData.RetainedObjects, extData.RetainedObjectMap)
+	playerInfo := extraction.ExtractPlayerInfo(extData.RetainedObjects, extData.RetainedObjectMap)
 
 	// Free maps only needed by RunPostExtraction
 	extData.CleanupAfterPostExtraction()
@@ -717,6 +718,7 @@ func processSave(savePath, mode string) (err error) {
 			CollectedCollectibles: extData.CollectedCollectibles,
 			Pickups:             extData.Pickups,
 			GameProgression:     gameProgression,
+			Players:             playerInfo,
 			SaveVersion:         int(header.SaveVersion),
 			Belts:               extData.Belts,
 			BeltHeads:           extData.BeltHeads,

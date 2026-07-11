@@ -296,6 +296,7 @@
         grid1.appendChild(card('Session', hdr.SessionName || 'Unknown', 'Version ' + hdr.SaveVersion));
         grid1.appendChild(card('Play Time', fmtTime(hdr.PlayDurationSeconds), 'Build ' + hdr.BuildVersion));
         grid1.appendChild(card('Save Date', fmtDate(hdr.SaveDateTime), ''));
+        if (gp.startingLocation) grid1.appendChild(card('Starting Location', gp.startingLocation, 'Where the pioneers landed'));
         if (hdr.IsModdedSave) grid1.appendChild(card('Modded', 'Yes', ''));
         s1.appendChild(grid1);
         c.appendChild(s1);
@@ -316,15 +317,47 @@
         s2.appendChild(grid2);
         c.appendChild(s2);
 
-        if (gp.currentPhase || gp.targetPhase) {
-            var s3 = section('Project Assembly');
+        if (gp.currentPhase || gp.targetPhase || (gp.purchasedSchematics && gp.purchasedSchematics.length > 0)) {
+            var s3 = section('Game Progression');
+            var se = (d.analytics && d.analytics.gameProgression && d.analytics.gameProgression.space_elevator) || {};
             var grid3 = h('div', { class: 'card-grid' });
-            grid3.appendChild(card('Current Phase', (gp.currentPhase || 'Unknown').replace('Project_Assembly_Phase_', 'Phase '), ''));
-            grid3.appendChild(card('Target Phase', (gp.targetPhase || 'Unknown').replace('Project_Assembly_Phase_', 'Phase '), ''));
-            if (gp.sinkTotalPoints) grid3.appendChild(card('Sink Points', fmt(gp.sinkTotalPoints), ''));
-            if (gp.sinkCoupons) grid3.appendChild(card('Sink Coupons', fmt(gp.sinkCoupons), ''));
-            if (gp.purchasedSchematics) grid3.appendChild(card('Schematics', fmt(gp.purchasedSchematics.length), 'purchased'));
+            if (se.current_phase_number !== undefined) {
+                var phaseLabel = se.current_phase_number === 0 ? 'Pre-Space Elevator' : 'Phase ' + se.current_phase_number;
+                if (se.is_completed && se.current_phase_number >= 5) phaseLabel = 'Phase 5 (Completed)';
+                grid3.appendChild(card('Current Phase', phaseLabel, ''));
+            }
+            if (!se.is_completed && se.target_phase_number !== undefined) {
+                var targetLabel = se.target_phase_number === 0 ? 'Not started' : 'Phase ' + se.target_phase_number;
+                grid3.appendChild(card('Target Phase', targetLabel, ''));
+            }
             s3.appendChild(grid3);
+
+            // Milestone tiers (schematics in X-Y format)
+            var schems = gp.purchasedSchematics || [];
+            var tierTotals = {1:3, 2:5, 3:4, 4:5, 5:5, 6:5, 7:5, 8:5, 9:5};
+            var tiers = {};
+            schems.forEach(function(s) {
+                var m = s.match(/^(\d+)-(\d+)$/);
+                if (m) {
+                    var tier = m[1];
+                    if (!tiers[tier]) tiers[tier] = {};
+                    tiers[tier][m[2]] = true;
+                }
+            });
+            var tierNums = Object.keys(tiers).sort(function(a, b) { return parseInt(a) - parseInt(b); });
+            if (tierNums.length > 0) {
+                var tierGrid = h('div', { class: 'card-grid' });
+                tierNums.forEach(function(t) {
+                    var count = Object.keys(tiers[t]).length;
+                    var total = tierTotals[t] || count;
+                    if (count > total) count = total;
+                    var color = count >= total ? '#4caf50' : '#00d4ff';
+                    var desc = count + '/' + total + ' milestones';
+                    if (t == '2' && count < total) desc += ' (one milestone not in save data)';
+                    tierGrid.appendChild(progressCard('Tier ' + t, count, total, desc, color));
+                });
+                s3.appendChild(tierGrid);
+            }
             c.appendChild(s3);
         }
 
@@ -1621,9 +1654,34 @@
         c.innerHTML = '';
         var d = DATA;
 
+        // --- AWESOME Sink ---
+        var agp = (d.analytics && d.analytics.gameProgression) || {};
+        var sink = agp.awesome_sink || {};
+        if (sink.coupons) {
+            var sinkSection = section('AWESOME Sink');
+            var sinkGrid = h('div', { class: 'card-grid' });
+            sinkGrid.appendChild(card('Coupons Available', fmt(sink.coupons), 'Unspent coupons'));
+            sinkSection.appendChild(sinkGrid);
+            c.appendChild(sinkSection);
+        }
+
+        // --- Player Stats ---
+        var players = (d.analytics && d.analytics.players) || [];
+        if (players.length > 0) {
+            var playerSection = section('Players (' + players.length + ')');
+            players.forEach(function(p) {
+                var pGrid = h('div', { class: 'card-grid' });
+                pGrid.appendChild(card('Player', p.name, ''));
+                if (p.inventorySlots) pGrid.appendChild(card('Inventory Slots', p.inventorySlots, 'Unlocked slots'));
+                if (p.visitedAreas) pGrid.appendChild(card('Areas Visited', p.visitedAreas, 'Map areas explored'));
+                if (p.playedMessages) pGrid.appendChild(card('Messages Played', p.playedMessages, 'Tutorial/story messages'));
+                playerSection.appendChild(pGrid);
+            });
+            c.appendChild(playerSection);
+        }
+
         // --- MAM Research ---
-        var gp = (d.analytics && d.analytics.gameProgression) || {};
-        var mam = gp.mam;
+        var mam = agp.mam;
         if (mam && mam.unlocked_count > 0) {
             var mamSection = section('MAM Research');
             var mamGrid = h('div', { class: 'card-grid' });
