@@ -1062,6 +1062,8 @@ func calculateGameProgressionAnalytics(input AnalyticsInput) map[string]interfac
 		name := t
 		if mapped, ok := treeMap[t]; ok {
 			name = mapped
+		} else if strings.HasSuffix(name, "_ResearchTree") {
+			name = strings.TrimSuffix(name, "_ResearchTree")
 		}
 		if !seen[name] {
 			seen[name] = true
@@ -1113,11 +1115,20 @@ func calculateGameProgressionAnalytics(input AnalyticsInput) map[string]interfac
 		total := treeTotals[tree]
 		prefixes := treeSchematicPrefixes[tree]
 		completed := 0
+		isUnknownTree := total == 0 && prefixes == nil
 		for _, s := range gp.PurchasedSchematics {
-			if !strings.HasPrefix(s, "Research_") {
+			if strings.HasSuffix(s, "_Hidden") {
 				continue
 			}
-			if strings.HasSuffix(s, "_Hidden") {
+			if isUnknownTree {
+				// For modded trees with no hardcoded prefixes, match schematics
+				// that start with the tree name (e.g. InfiniteZoop_ResearchNode1).
+				if strings.HasPrefix(s, tree+"_") {
+					completed++
+				}
+				continue
+			}
+			if !strings.HasPrefix(s, "Research_") {
 				continue
 			}
 			if crossTree, isCross := crossListed[s]; isCross {
@@ -1144,6 +1155,10 @@ func calculateGameProgressionAnalytics(input AnalyticsInput) map[string]interfac
 			if percentage > 100 {
 				percentage = 100
 			}
+		}
+		// Unknown trees (modded) use total=-1 to signal "unknown" to the viewer.
+		if isUnknownTree {
+			total = -1
 		}
 		mamProgress[tree] = map[string]interface{}{
 			"completed":  completed,

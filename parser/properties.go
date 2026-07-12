@@ -833,7 +833,7 @@ func (d *DataBlobParser) parseBuildableSubsystemSpecial(r *BinaryReader) (interf
 		r.ReadString() // typeRef levelName
 		typeRefPn := r.ReadString()
 		instanceCount := r.ReadInt32()
-		if instanceCount < 0 || instanceCount > 200000 {
+		if instanceCount < 0 || instanceCount > 10000000 {
 			return nil, fmt.Errorf("invalid instanceCount: %d for %s", instanceCount, typeRefPn)
 		}
 

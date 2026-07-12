@@ -17,6 +17,12 @@ How to use this file:
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-07-12
+
+### Fixed
+- Foundation extraction: increased lightweight buildable `instanceCount` limit from 200,000 to 10,000,000 to support large modded saves with millions of foundations.
+- Modded MAM research trees (e.g. InfiniteZoop) no longer show 0/0 — unknown trees display completed node count with "?" total and graceful "Modded tree" labeling.
+
 ## [1.2.0] - 2026-07-11
 
 ### Added

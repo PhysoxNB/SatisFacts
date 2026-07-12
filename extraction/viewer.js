@@ -142,7 +142,8 @@
     function progressCard(label, collected, total, desc, color) {
         var c = color || '#00d4ff';
         var style = 'border-left-color: ' + c + '; background: ' + c + '22;';
-        var pct = total > 0 ? Math.min(100, (collected / total) * 100) : 0;
+        var numericTotal = (typeof total === 'number' && total > 0) ? total : 0;
+        var pct = numericTotal > 0 ? Math.min(100, (collected / numericTotal) * 100) : 0;
         var valueText = collected + ' / ' + total;
         var descEl = desc ? h('div', { class: 'desc', text: desc }) : null;
         return h('div', { class: 'card', style: style },
@@ -1698,8 +1699,14 @@
                     var completed = p.completed || 0;
                     var total = p.total || 0;
                     var pct = p.percentage || 0;
-                    var color = pct >= 100 ? '#4caf50' : '#00d4ff';
-                    progGrid.appendChild(progressCard(tree, completed, total, pct + '% complete', color));
+                    if (total < 0) {
+                        var color = completed > 0 ? '#00d4ff' : '#888';
+                        var desc = completed > 0 ? completed + ' node' + (completed > 1 ? 's' : '') + ' unlocked — total unknown' : 'Modded tree — total unknown';
+                        progGrid.appendChild(progressCard(tree, completed, '?', desc, color));
+                    } else {
+                        var color = pct >= 100 ? '#4caf50' : '#00d4ff';
+                        progGrid.appendChild(progressCard(tree, completed, total, pct + '% complete', color));
+                    }
                 });
                 mamSection.appendChild(progGrid);
             }
