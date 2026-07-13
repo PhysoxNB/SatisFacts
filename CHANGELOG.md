@@ -17,6 +17,15 @@ How to use this file:
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-07-13
+
+### Added
+- Creatures Killed section in Extras tab: shows total kills and per-creature-type breakdown
+
+### Fixed
+- Table column alignment in Extras tab: number columns (Count/Kills) no longer shift when toggling Expert Mode.
+- itch.io Link updated
+
 ## [1.2.1] - 2026-07-12
 
 ### Fixed

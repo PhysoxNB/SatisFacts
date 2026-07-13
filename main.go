@@ -18,7 +18,7 @@ import (
 )
 
 // release version, shown by --version
-const version = "1.2.1"
+const version = "1.3.0"
 
 // Shared buffered reader for all console input. Using one reader avoids
 // bufio swallowing bytes that a separate os.Stdin.Read never sees (Git Bash,
@@ -678,6 +678,14 @@ func processSave(savePath, mode string) (err error) {
 		bw.Write(data)
 	}
 
+	// Creature kills summary
+	bw.WriteString(`,"creatureKills":`)
+	if data, err := json.Marshal(extData.CreatureKills); err != nil {
+		return fmt.Errorf("marshalling creature kills: %w", err)
+	} else {
+		bw.Write(data)
+	}
+
 	// Game progression
 	bw.WriteString(`,"gameProgression":`)
 	if data, err := json.Marshal(gameProgression); err != nil {
@@ -810,6 +818,7 @@ func processSave(savePath, mode string) (err error) {
 		Buildings:       extData.Buildings,
 		Blueprints:      extData.Blueprints,
 		Pets:            extData.Pets,
+		CreatureKills:   extData.CreatureKills,
 		Extraction:      postData,
 		Structures:      extData.Structures,
 		Production:      productionOut,
@@ -859,6 +868,11 @@ func processSave(savePath, mode string) (err error) {
 	// Pets summary
 	if extData.Pets.TamedDoggos > 0 {
 		printSummaryLinef("Pets:", "%d tamed Lizard Doggos", extData.Pets.TamedDoggos)
+	}
+
+	// Creature kills summary
+	if extData.CreatureKills.Total > 0 {
+		printSummaryLinef("Creatures killed:", "%d (%d types)", extData.CreatureKills.Total, len(extData.CreatureKills.ByType))
 	}
 
 	// Collectibles summary

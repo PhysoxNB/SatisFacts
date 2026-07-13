@@ -88,6 +88,9 @@ type ExtractedData struct {
 	// Pets (tamed creatures)
 	Pets PetData
 
+	// Creatures killed by players
+	CreatureKills CreatureKillData
+
 	// Totals
 	TotalProcessed int
 
@@ -99,6 +102,38 @@ type ExtractedData struct {
 type PetData struct {
 	TamedDoggos int `json:"tamedDoggos"`
 	TotalDoggos int `json:"totalDoggos"`
+}
+
+// CreatureKillData tracks creatures killed by players, by creature type.
+type CreatureKillData struct {
+	ByType  map[string]int `json:"byType"`  // pathName -> kill count
+	Total   int            `json:"total"`
+}
+
+// creatureDisplayName maps creature class paths (from mCreaturesKilledCount)
+// to friendly display names. The key is the full pathName from the ObjectProperty key.
+var creatureDisplayName = map[string]string{
+	"/Game/FactoryGame/Character/Creature/Wildlife/NonFlyingBird/Char_NonFlyingBird.Char_NonFlyingBird_C": "Non-flying Bird",
+	"/Game/FactoryGame/Character/Creature/Wildlife/Beetle/Char_Beetle.Char_Beetle_C":                     "Non-flying Bird",
+	"/Game/FactoryGame/Character/Creature/Enemy/Hog/Char_Hog.Char_Hog_C":                                   "Fluffy-tailed Hog",
+	"/Game/FactoryGame/Character/Creature/Enemy/Hog/NuclearHog/Char_NuclearHog.Char_NuclearHog_C":         "Nuclear Hog",
+	"/Game/FactoryGame/Character/Creature/Enemy/Hog/CliffHog/Char_CliffHog.Char_CliffHog_C":               "Cliff Hog",
+	"/Game/FactoryGame/Character/Creature/Enemy/Spitter/SpitterDesert/Char_SpitterDesertSmall.Char_SpitterDesertSmall_C": "Small Desert Spitter",
+	"/Game/FactoryGame/Character/Creature/Enemy/Spitter/SpitterDesert/Char_SpitterDesertAlpha.Char_SpitterDesertAlpha_C": "Alpha Desert Spitter",
+	"/Game/FactoryGame/Character/Creature/Enemy/Spitter/SpitterForest/Char_SpitterForestSmall.Char_SpitterForestSmall_C": "Small Forest Spitter",
+	"/Game/FactoryGame/Character/Creature/Enemy/Spitter/SpitterForest/Char_SpitterForestAlpha.Char_SpitterForestAlpha_C": "Alpha Forest Spitter",
+	"/Game/FactoryGame/Character/Creature/Enemy/Spitter/SpitterForestRed/Char_SpitterForestRedSmall.Char_SpitterForestRedSmall_C": "Small Red Forest Spitter",
+	"/Game/FactoryGame/Character/Creature/Enemy/Spitter/SpitterForestRed/Char_SpitterForestRedAlpha.Char_SpitterForestRedAlpha_C": "Alpha Red Forest Spitter",
+	"/Game/FactoryGame/Character/Creature/Enemy/Spitter/SpitterAquatic/Char_SpitterAquaticSmall.Char_SpitterAquaticSmall_C": "Small Aquatic Spitter",
+	"/Game/FactoryGame/Character/Creature/Enemy/Spitter/SpitterAquatic/Char_SpitterAquaticAlpha.Char_SpitterAquaticAlpha_C": "Alpha Aquatic Spitter",
+	"/Game/FactoryGame/Character/Creature/Enemy/Stinger/SmallStinger/Char_Stinger_Child.Char_Stinger_Child_C": "Small Stinger",
+	"/Game/FactoryGame/Character/Creature/Enemy/Stinger/Char_Stinger.Char_Stinger_C":                         "Stinger",
+	"/Game/FactoryGame/Character/Creature/Enemy/Stinger/BigStinger/Char_EliteStinger.Char_EliteStinger_C":   "Elite Stinger",
+	"/Game/FactoryGame/Character/Creature/Enemy/Stinger/GasStinger/Char_GasStinger.Char_GasStinger_C":      "Gas Stinger",
+	"/Game/FactoryGame/Character/Creature/Wildlife/SpaceGiraffe/Char_SpaceGiraffe.Char_SpaceGiraffe_C":     "Space Giraffe-Tick-Penguin-Whale Thing",
+	"/Game/FactoryGame/Character/Creature/Wildlife/SpaceRabbit/Char_SpaceRabbit.Char_SpaceRabbit_C":        "Lizard Doggo",
+	"/Game/FactoryGame/Character/Creature/Enemy/CrabHatcher/Char_CrabHatcher.Char_CrabHatcher_C":          "Flying Crab Hatcher",
+	"/Game/FactoryGame/Character/Creature/Enemy/CrabHatcher/Char_BigCrabHatcher.Char_BigCrabHatcher_C":    "Flying Crab Hatcher",
 }
 
 type PickupItem struct {
@@ -246,6 +281,9 @@ func NewExtractedDataWithMode(extractStructures bool, mapMode bool) *ExtractedDa
 			CrashSites:       make(map[string]bool),
 		},
 		mapMode:           mapMode,
+		CreatureKills: CreatureKillData{
+			ByType: make(map[string]int),
+		},
 	}
 	if extractStructures {
 		e.Structures = &StructureData{
@@ -779,6 +817,40 @@ func (e *ExtractedData) ProcessObject(obj *parser.SaveObject, extractStructures 
 		e.PowerGrid.ComponentCount++
 	}
 	} // end if instanceName != ""
+
+	// Creatures killed — read from FGStatisticsSubsystem mCreaturesKilledCount
+	if strings.Contains(typeLower, "statisticssubsystem") {
+		if ckProp, ok := obj.Properties["mCreaturesKilledCount"]; ok {
+			if mp, ok := ckProp.Value.(map[string]interface{}); ok {
+				if entries, ok := mp["entries"].([]interface{}); ok {
+					for _, entry := range entries {
+						if em, ok := entry.(map[string]interface{}); ok {
+							var pathName string
+							// ObjectProperty keys are map[string]string
+							if keyMap, ok := em["key"].(map[string]string); ok {
+								pathName = keyMap["pathName"]
+							} else if keyMap, ok := em["key"].(map[string]interface{}); ok {
+								pathName, _ = keyMap["pathName"].(string)
+							}
+							var count int
+							switch v := em["value"].(type) {
+							case int32:
+								count = int(v)
+							case int:
+								count = v
+							case int64:
+								count = int(v)
+							}
+							if pathName != "" && count > 0 {
+								e.CreatureKills.ByType[pathName] = count
+								e.CreatureKills.Total += count
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 
 	// Extract item pickups (scattered items on the map)
 	if strings.Contains(typeLower, "itempickup") && obj.Header.NeedTransform {

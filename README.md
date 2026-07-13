@@ -16,7 +16,7 @@ Parses Satisfactory save files and generates detailed HTML reports with power gr
 
 ## Download & Run
 
-Grab a ready-to-use build from the [**Releases**](https://github.com/PhysoxNB/SatisFacts/releases) page or [**itch.io**](https://physox.itch.io/satisfacts) — no need to install anything.
+Grab a ready-to-use build from the [**Releases**](https://github.com/PhysoxNB/SatisFacts/releases) page or [**itch.io**](https://physox.itch.io/satisfacts-satisfactory-save-file-analyzer) — no need to install anything.
 
 ### Windows
 1. Download `SatisFacts.exe`.

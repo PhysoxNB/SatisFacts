@@ -458,6 +458,7 @@ type ReportData struct {
 	Buildings        map[string]int         `json:"buildings"`
 	Blueprints       map[string]int         `json:"blueprints,omitempty"`
 	Pets             interface{}            `json:"pets,omitempty"`
+	CreatureKills    interface{}            `json:"creatureKills,omitempty"`
 	Extraction      interface{}            `json:"extraction"`
 	Structures      interface{}            `json:"structures"`
 	Production      interface{}            `json:"production"`

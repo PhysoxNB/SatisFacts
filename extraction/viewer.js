@@ -80,6 +80,41 @@
         return name.replace(/\s+/g, ' ').trim();
     }
 
+    var creatureNameMap = {
+        '/Game/FactoryGame/Character/Creature/Wildlife/NonFlyingBird/Char_NonFlyingBird.Char_NonFlyingBird_C': 'Non-flying Bird',
+        '/Game/FactoryGame/Character/Creature/Wildlife/Beetle/Char_Beetle.Char_Beetle_C': 'Non-flying Bird',
+        '/Game/FactoryGame/Character/Creature/Enemy/Hog/Char_Hog.Char_Hog_C': 'Fluffy-tailed Hog',
+        '/Game/FactoryGame/Character/Creature/Enemy/Hog/NuclearHog/Char_NuclearHog.Char_NuclearHog_C': 'Nuclear Hog',
+        '/Game/FactoryGame/Character/Creature/Enemy/Hog/CliffHog/Char_CliffHog.Char_CliffHog_C': 'Cliff Hog',
+        '/Game/FactoryGame/Character/Creature/Enemy/Spitter/SpitterDesert/Char_SpitterDesertSmall.Char_SpitterDesertSmall_C': 'Small Desert Spitter',
+        '/Game/FactoryGame/Character/Creature/Enemy/Spitter/SpitterDesert/Char_SpitterDesertAlpha.Char_SpitterDesertAlpha_C': 'Alpha Desert Spitter',
+        '/Game/FactoryGame/Character/Creature/Enemy/Spitter/SpitterForest/Char_SpitterForestSmall.Char_SpitterForestSmall_C': 'Small Forest Spitter',
+        '/Game/FactoryGame/Character/Creature/Enemy/Spitter/SpitterForest/Char_SpitterForestAlpha.Char_SpitterForestAlpha_C': 'Alpha Forest Spitter',
+        '/Game/FactoryGame/Character/Creature/Enemy/Spitter/SpitterForestRed/Char_SpitterForestRedSmall.Char_SpitterForestRedSmall_C': 'Small Red Forest Spitter',
+        '/Game/FactoryGame/Character/Creature/Enemy/Spitter/SpitterForestRed/Char_SpitterForestRedAlpha.Char_SpitterForestRedAlpha_C': 'Alpha Red Forest Spitter',
+        '/Game/FactoryGame/Character/Creature/Enemy/Spitter/SpitterAquatic/Char_SpitterAquaticSmall.Char_SpitterAquaticSmall_C': 'Small Aquatic Spitter',
+        '/Game/FactoryGame/Character/Creature/Enemy/Spitter/SpitterAquatic/Char_SpitterAquaticAlpha.Char_SpitterAquaticAlpha_C': 'Alpha Aquatic Spitter',
+        '/Game/FactoryGame/Character/Creature/Enemy/Stinger/SmallStinger/Char_Stinger_Child.Char_Stinger_Child_C': 'Small Stinger',
+        '/Game/FactoryGame/Character/Creature/Enemy/Stinger/Char_Stinger.Char_Stinger_C': 'Stinger',
+        '/Game/FactoryGame/Character/Creature/Enemy/Stinger/BigStinger/Char_EliteStinger.Char_EliteStinger_C': 'Elite Stinger',
+        '/Game/FactoryGame/Character/Creature/Enemy/Stinger/GasStinger/Char_GasStinger.Char_GasStinger_C': 'Gas Stinger',
+        '/Game/FactoryGame/Character/Creature/Wildlife/SpaceGiraffe/Char_SpaceGiraffe.Char_SpaceGiraffe_C': 'Space Giraffe-Tick-Penguin-Whale Thing',
+        '/Game/FactoryGame/Character/Creature/Wildlife/SpaceRabbit/Char_SpaceRabbit.Char_SpaceRabbit_C': 'Lizard Doggo',
+        '/Game/FactoryGame/Character/Creature/Enemy/CrabHatcher/Char_CrabHatcher.Char_CrabHatcher_C': 'Flying Crab Hatcher',
+        '/Game/FactoryGame/Character/Creature/Enemy/CrabHatcher/Char_BigCrabHatcher.Char_BigCrabHatcher_C': 'Flying Crab Hatcher'
+    };
+
+    function creatureDisplayName(cls) {
+        if (creatureNameMap[cls]) return creatureNameMap[cls];
+        // Fallback: extract class name from path and clean up
+        var name = cls.split('/').pop();
+        if (name.includes('.')) name = name.split('.')[0];
+        name = name.replace(/^Char_/, '').replace(/_C$/, '');
+        name = name.replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+        name = name.replace(/_/g, ' ');
+        return name.replace(/\s+/g, ' ').trim();
+    }
+
     function safe(v, fallback) {
         return (v !== null && v !== undefined) ? v : (fallback || 0);
     }
@@ -1734,7 +1769,7 @@
                 return parseInt(b[1].replace(/,/g, '')) - parseInt(a[1].replace(/,/g, ''));
             });
             bpSection.appendChild(sortableTable(
-                [{label: 'Type', width: '45%'}, {label: 'Count', type: 'number', width: '10%'}, {label: 'Type Path', cls: 'type-path-col', width: '45%'}],
+                [{label: 'Type', width: 'auto'}, {label: 'Count', type: 'number', width: '10%'}, {label: 'Type Path', cls: 'type-path-col', width: '45%'}],
                 bpRows,
                 {scrollable: bpRows.length > 20}
             ));
@@ -1749,6 +1784,26 @@
             grid.appendChild(card('Lizard Doggos (Tamed)', fmt(pets.tamedDoggos || 0), 'tamed by players'));
             petSection.appendChild(grid);
             c.appendChild(petSection);
+        }
+
+        // --- Creatures Killed ---
+        var ck = d.creatureKills || {};
+        if (ck.total > 0) {
+            var ckSection = section('Creatures Killed (' + fmt(ck.total) + ')');
+            var byType = ck.byType || {};
+            var ckKeys = Object.keys(byType).sort(function(a, b) {
+                return byType[b] - byType[a];
+            });
+            var ckRows = ckKeys.map(function(cls) {
+                var name = creatureDisplayName(cls);
+                return [name, fmt(byType[cls]), cls];
+            });
+            ckSection.appendChild(sortableTable(
+                [{label: 'Creature', width: 'auto'}, {label: 'Kills', type: 'number', width: '10%'}, {label: 'Class', cls: 'type-path-col', width: '45%'}],
+                ckRows,
+                {scrollable: ckRows.length > 15}
+            ));
+            c.appendChild(ckSection);
         }
 
         // Show a message if no extras data is available
