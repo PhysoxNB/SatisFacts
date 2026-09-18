@@ -20,16 +20,16 @@ type GameProgressionData struct {
 	SinkDNAPoints         int      `json:"sinkDNAPoints"`
 
 	// Custom map settings (1.2+, stored in BP_GameState)
-	NodePuritySetting        string  `json:"nodePuritySetting,omitempty"`
-	NodeRandomization        string  `json:"nodeRandomization,omitempty"`
-	NodeRandomizationSeed    int32   `json:"nodeRandomizationSeed,omitempty"`
-	PartsCostMultiplier      float32 `json:"partsCostMultiplier,omitempty"`
-	SpacePartsCostMultiplier float32 `json:"spacePartsCostMultiplier,omitempty"`
+	NodePuritySetting          string  `json:"nodePuritySetting,omitempty"`
+	NodeRandomization          string  `json:"nodeRandomization,omitempty"`
+	NodeRandomizationSeed      int32   `json:"nodeRandomizationSeed,omitempty"`
+	PartsCostMultiplier        float32 `json:"partsCostMultiplier,omitempty"`
+	SpacePartsCostMultiplier   float32 `json:"spacePartsCostMultiplier,omitempty"`
 	PowerConsumptionMultiplier float32 `json:"powerConsumptionMultiplier,omitempty"`
 
 	// World info
-	TradingPostLevel  int    `json:"tradingPostLevel,omitempty"`
-	StartingLocation  string `json:"startingLocation,omitempty"`
+	TradingPostLevel int    `json:"tradingPostLevel,omitempty"`
+	StartingLocation string `json:"startingLocation,omitempty"`
 }
 
 // ExtractGameProgression finds the game state object and reads progression off
@@ -124,7 +124,7 @@ func ExtractGameProgression(retained []*parser.SaveObject, objectMap map[string]
 		if v, ok := GetPropFloat32(obj, "mSpacePartsCostMultiplier"); ok {
 			gp.SpacePartsCostMultiplier = v
 		}
-		if v, ok := GetPropFloat32(obj, "mPowerConsumptionMultiplier"); ok {
+		if v, ok := GetPropFloat32(obj, "mEnergyCostMultiplier"); ok {
 			gp.PowerConsumptionMultiplier = v
 		}
 	}
@@ -227,9 +227,7 @@ func extractPhaseName(obj *parser.SaveObject, propName string) string {
 		phaseName = phaseName[idx+1:]
 	}
 	phaseName = strings.TrimSuffix(phaseName, "_C")
-	if strings.Contains(phaseName, "GP_") {
-		phaseName = strings.Replace(phaseName, "GP_", "", 1)
-	}
+	phaseName = strings.Replace(phaseName, "GP_", "", 1)
 	if strings.Contains(phaseName, ".") {
 		phaseName = strings.Split(phaseName, ".")[0]
 	}
@@ -359,10 +357,10 @@ func getArrayItems(prop parser.Property) []interface{} {
 }
 
 type PlayerInfo struct {
-	Name             string `json:"name"`
-	InventorySlots   int    `json:"inventorySlots"`
-	VisitedAreas     int    `json:"visitedAreas"`
-	PlayedMessages   int    `json:"playedMessages"`
+	Name           string `json:"name"`
+	InventorySlots int    `json:"inventorySlots"`
+	VisitedAreas   int    `json:"visitedAreas"`
+	PlayedMessages int    `json:"playedMessages"`
 }
 
 func ExtractPlayerInfo(retained []*parser.SaveObject, objectMap map[string]*parser.SaveObject) []PlayerInfo {

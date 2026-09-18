@@ -17,6 +17,76 @@ How to use this file:
 
 ## [Unreleased]
 
+## [2.0.0] - The Big One – Desktop App, Save Editor & Analytics Overhaul (2026-11-05)
+
+### Added
+- New interactive Map tab with WebGL2 rendering, zoom/pan, object hover tooltips, category filters, Z-level filtering, and radius search.
+- New Train Details table showing train names, locomotive/wagon counts, current station, timetables and total route distance in km.
+- New Train Stations table showing station names, connected platforms, docked trains and docking times.
+- New Vehicle Details table with vehicle names, types, fuel status and warning badges for vehicles without fuel.
+- New Vehicle Stations table displaying station types, docking status and power warnings.
+- New Drone Details table including fuel type, docking status and home station.
+- New Drone Stations table showing paired station connections.
+- Vehicle overview now includes Trucks, Fluid Trucks, Tractors, Explorers, Golf Carts, Cyber Wagons and all station types.
+- Vehicle Tracks card displaying the combined route length of all vehicle paths (Save Version 1.2+).
+- Consumables section showing everything the player has consumed (berries, nuts, inhalers and more).
+- New Storage Breakdown table showing the total amount of each item stored in each container.
+- Added remaining locations for Power Slugs, Somersloops, Mercer Spheres and Crash Sites in collapsible dropdowns.
+- Added icons for all structures, building pieces and items across the report.
+- Desktop GUI application (Wails) with tabbed interface replacing the command-line tool.
+- Depot Reorder: drag-and-drop reordering of Dimensional Depot items with live preview before saving.
+- Belt & Pipe Upgrade: upgrade all belts and lifts to a target Mk tier and pipes to Mk2.
+- Multipliers: patch custom game cost multipliers (recipe, space elevator, power consumption) beyond in-game UI limits.
+- Blueprint Category Copy: copy blueprint folder structure between saves with replace or merge mode.
+- Blueprint Export/Import: export blueprint categories to a `.sfbcat` file and import them into another save.
+- Game Config Editor: edit `Engine.ini` and `Input.ini` directly from the app without hunting for the config files manually.
+- Multilanguage support: full English and German translations for the desktop UI and HTML report, switchable via flag buttons.
+- Zoom control: adjustable UI zoom level (80%–150%) from the header dropdown, saved across sessions.
+- Window size persistence: the app remembers its window size between launches.
+- Session Name Fix: automatic detection and repair of problematic session names (trailing spaces, invalid Windows characters).
+- Save Optimization: reduce save file size (typically by 10–23%) by sorting objects by class name for better compression.
+- Analyze with real-time progress bar.
+- Auto-detect save directory and auto-analyze options.
+- Settings page with auto-save confirmation.
+- Help page with usage guide, FAQ and support contact links.
+
+### Changed
+- Complete HTML report overhaul across every analytics tab with a new, consistent design, cleaner layouts, improved organization, side-by-side sections and better readability.
+- Logistics infrastructure has been moved from the Transport tab into its own dedicated **Logistics** tab.
+- Transport tab now focuses exclusively on transportation systems.
+- Renamed **Production** tab to **Extraction** for better clarity.
+- Search now covers the whole report instead of just the current tab: results are grouped per tab and clicking one jumps straight to it. The query is also kept when switching tabs rather than being cleared.
+- Miner and Fluid Extractor details have been merged into a single unified table.
+- Resource names now use proper in-game display names instead of internal identifiers throughout the application.
+- Card colors now convey meaning rather than tab identity: plain summary and count cards are neutral, color is reserved for values that actually mean something.
+- Buildings tab: "Storage Player" renamed to "Personal Storage", "Storage Integrated" renamed to "Hub Storage".
+- Buildings tab: water pumps moved from Production to Mining category.
+- Buildings tab: removed rail track segments, switch controls, flow indicators, equipment items, and blueprint storage - these are infrastructure or items, not buildings.
+- Pagination optimized for easier browsing.
+- Removed Expert Mode.
+- Reworked README with Features section and accurate tab/feature descriptions.
+- Updated screenshots and preview images.
+
+### Fixed
+- Fixed collectible counting where several collectibles were previously ignored.
+- Fixed vehicle detection causing certain vehicle types to never appear.
+- Fixed train station counting where freight platforms were incorrectly counted as train stations.
+- Fixed HUB milestone progression counting.
+- Fixed fracking extractor resource and purity detection.
+- Fixed multiple resource names displaying internal identifiers instead of proper in-game names.
+- Fixed oil pump purity always showing "normal" and capacity not accounting for node purity.
+- Fixed MAM Research - Nutrients and Mycelia are now shown as separate trees (previously merged into one "Nutrients (Mycelia)" tree).
+- Fixed sorting on the large paginated tables (Individual Generators, Power Consumers, Extractor Details, Nuclear Plants, per-recipe buildings) - clicking a column header now sorts the entire table instead of only the rows on the current page.
+- Fixed Personal Elevator not shown as Power Consumer.
+- Fixed AWESOME Sink not shown as Power Consumer.
+
+### Removed
+- Removed command-line interface (replaced by desktop GUI).
+- Removed QUICK-mode.
+
+### Acknowledgments
+- Special thanks to Paul for his invaluable contributions to the map renderer and many v2.0 features.
+
 ## [1.3.0] - 2026-07-13
 
 ### Added
@@ -90,7 +160,10 @@ First public release.
 ### Changed
 - Peak memory reduced by ~60% on large saves via streaming extraction and compact fact retention.
 
-[Unreleased]: https://github.com/PhysoxNB/SatisFacts/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/PhysoxNB/SatisFacts/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/PhysoxNB/SatisFacts/compare/v1.3.0...v2.0.0
+[1.3.0]: https://github.com/PhysoxNB/SatisFacts/compare/v1.2.1...v1.3.0
+[1.2.1]: https://github.com/PhysoxNB/SatisFacts/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/PhysoxNB/SatisFacts/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/PhysoxNB/SatisFacts/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/PhysoxNB/SatisFacts/compare/v1.0.0...v1.0.1

@@ -10,11 +10,11 @@ import (
 // StreamingReader reads decompressed data chunk by chunk so we never keep the
 // whole body in memory. Forward-only, no seeking.
 type StreamingReader struct {
-	chunkCh    <-chan ChunkResult
-	current    []byte
-	offset     int
-	virtPos    int64
-	exhausted  bool
+	chunkCh   <-chan ChunkResult
+	current   []byte
+	offset    int
+	virtPos   int64
+	exhausted bool
 }
 
 func NewStreamingReader(chunkCh <-chan ChunkResult) *StreamingReader {

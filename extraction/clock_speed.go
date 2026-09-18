@@ -6,16 +6,16 @@ import (
 
 // How many somersloop slots each building type has.
 var somersloopMaxSlots = map[string]int{
-	"smelter":             1,
-	"constructor":         1,
-	"assembler":           2,
-	"foundry":             2,
-	"refinery":            2,
-	"converter":           2,
-	"manufacturer":        4,
-	"blender":             4,
-	"hadron":              4,
-	"quantum":             4,
+	"smelter":      1,
+	"constructor":  1,
+	"assembler":    2,
+	"foundry":      2,
+	"refinery":     2,
+	"converter":    2,
+	"manufacturer": 4,
+	"blender":      4,
+	"hadron":       4,
+	"quantum":      4,
 }
 
 // ClockSpeedResult is the clock speed and production boost for one building.
@@ -37,10 +37,15 @@ func ExtractClockSpeeds(facts map[string]*BuildingFacts) (clockSpeeds map[string
 
 		isExcluded := isExcludedBuilding(typeLower)
 
-		// Production buildings: clock speed from mCurrentPotential.
+		// Production buildings: clock speed from mCurrentPotential,
+		// falling back to mPendingPotential for buildings not yet
+		// connected to a power grid.
 		if IsBuilding(typePath) && !isExcluded {
 			if bf.HasCurrentPotential {
 				clockSpeeds[instanceName] = bf.CurrentPotential * 100
+				buildingTypes[instanceName] = typePath
+			} else if bf.HasPendingPotential {
+				clockSpeeds[instanceName] = bf.PendingPotential * 100
 				buildingTypes[instanceName] = typePath
 			} else {
 				clockSpeeds[instanceName] = 100
@@ -108,4 +113,3 @@ func isExcludedBuilding(typeLower string) bool {
 	}
 	return false
 }
-

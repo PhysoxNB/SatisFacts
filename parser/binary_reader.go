@@ -18,9 +18,9 @@ func NewBinaryReader(data []byte) *BinaryReader {
 	return &BinaryReader{data: data, pos: 0}
 }
 
-func (r *BinaryReader) Position() int    { return r.pos }
-func (r *BinaryReader) Length() int       { return len(r.data) }
-func (r *BinaryReader) Remaining() int    { return len(r.data) - r.pos }
+func (r *BinaryReader) Position() int      { return r.pos }
+func (r *BinaryReader) Length() int        { return len(r.data) }
+func (r *BinaryReader) Remaining() int     { return len(r.data) - r.pos }
 func (r *BinaryReader) CanRead(n int) bool { return r.pos+n <= len(r.data) }
 
 func (r *BinaryReader) SetPosition(pos int) {
@@ -34,61 +34,80 @@ func (r *BinaryReader) Skip(n int) {
 	r.SetPosition(r.pos + n)
 }
 
+// ensure panics with a clear message instead of a generic slice-out-of-range.
+// Callers that use recover() (e.g. parser/properties.go) still catch this, but
+// the error message now says what was being read and where.
+func (r *BinaryReader) ensure(n int) {
+	if !r.CanRead(n) {
+		panic(fmt.Sprintf("BinaryReader: need %d bytes at pos %d (len=%d, remaining=%d)", n, r.pos, len(r.data), r.Remaining()))
+	}
+}
+
 func (r *BinaryReader) ReadInt8() int8 {
+	r.ensure(1)
 	v := int8(r.data[r.pos])
 	r.pos++
 	return v
 }
 
 func (r *BinaryReader) ReadUInt8() uint8 {
+	r.ensure(1)
 	v := r.data[r.pos]
 	r.pos++
 	return v
 }
 
 func (r *BinaryReader) ReadInt16() int16 {
+	r.ensure(2)
 	v := int16(binary.LittleEndian.Uint16(r.data[r.pos:]))
 	r.pos += 2
 	return v
 }
 
 func (r *BinaryReader) ReadUInt16() uint16 {
+	r.ensure(2)
 	v := binary.LittleEndian.Uint16(r.data[r.pos:])
 	r.pos += 2
 	return v
 }
 
 func (r *BinaryReader) ReadInt32() int32 {
+	r.ensure(4)
 	v := int32(binary.LittleEndian.Uint32(r.data[r.pos:]))
 	r.pos += 4
 	return v
 }
 
 func (r *BinaryReader) ReadUInt32() uint32 {
+	r.ensure(4)
 	v := binary.LittleEndian.Uint32(r.data[r.pos:])
 	r.pos += 4
 	return v
 }
 
 func (r *BinaryReader) ReadInt64() int64 {
+	r.ensure(8)
 	v := int64(binary.LittleEndian.Uint64(r.data[r.pos:]))
 	r.pos += 8
 	return v
 }
 
 func (r *BinaryReader) ReadUInt64() uint64 {
+	r.ensure(8)
 	v := binary.LittleEndian.Uint64(r.data[r.pos:])
 	r.pos += 8
 	return v
 }
 
 func (r *BinaryReader) ReadFloat32() float32 {
+	r.ensure(4)
 	v := math.Float32frombits(binary.LittleEndian.Uint32(r.data[r.pos:]))
 	r.pos += 4
 	return v
 }
 
 func (r *BinaryReader) ReadFloat64() float64 {
+	r.ensure(8)
 	v := math.Float64frombits(binary.LittleEndian.Uint64(r.data[r.pos:]))
 	r.pos += 8
 	return v

@@ -58,7 +58,7 @@ func parseInventoryStacks(stacks []interface{}) []InventoryStack {
 		if itemPath == "" {
 			continue
 		}
-		itemName := cleanItemName(itemPath)
+		itemName := CleanItemName(itemPath)
 		if itemName == "" {
 			continue
 		}
@@ -93,4 +93,27 @@ func isFluidItem(itemName string) bool {
 		}
 	}
 	return false
+}
+
+// computeInventoryFill returns the fill percentage (0-100) of an inventory.
+// stacks are the non-empty slots, totalSlots includes empty slots.
+// Each slot's fill ratio is numItems/StackSize; empty slots contribute 0.
+func computeInventoryFill(stacks []InventoryStack, totalSlots int) int {
+	if totalSlots <= 0 {
+		return 0
+	}
+	if len(stacks) == 0 {
+		return 0
+	}
+	totalFill := 0.0
+	for _, s := range stacks {
+		if s.StackSize > 0 {
+			totalFill += float64(s.numItems) / float64(s.StackSize)
+		}
+	}
+	pct := totalFill / float64(totalSlots) * 100
+	if pct > 100 {
+		pct = 100
+	}
+	return int(pct)
 }

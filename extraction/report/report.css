@@ -1,0 +1,1000 @@
+:root {
+  color-scheme: dark;
+  --bg: #0d0d11;
+  --surface: #16161e;
+  --surface2: #1e1e28;
+  --surface3: #25252f;
+  --border: #2e2e3a;
+  --border-light: #3a3a4a;
+  --text: #e2e2ea;
+  --text-dim: #9090a4;
+  --text-bright: #f0f0f5;
+  --accent: #00d4ff;
+  --accent-dim: #006880;
+  --green: #22c55e;
+  --green-dim: #163d2a;
+  --red: #ef4444;
+  --red-dim: #3d1616;
+  --orange: #f59e0b;
+  --orange-dim: #3d2a0a;
+  --purple: #a855f7;
+  --purple-dim: #2a1a3d;
+  --yellow: #eab308;
+  --yellow-dim: #3d3210;
+  --blue: #3b82f6;
+  --blue-dim: #1a2a3d;
+  --pink: #ec4899;
+  --pink-dim: #3d1a2a;
+  --content-width: 2000px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { background: var(--bg); }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+#loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-size: 1.2em;
+  color: var(--accent);
+}
+
+#loading .spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 12px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* sticky header + tabs wrapper: stays pinned to top when scrolling.
+   z-index:100 keeps it above table sticky headers (z-index:1) */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* header */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 24px;
+}
+
+header .header-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  max-width: var(--content-width);
+  margin: 0 auto;
+}
+
+header h1 {
+  font-size: 1.2em;
+  color: var(--accent);
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 200px;
+}
+
+#lang-switcher {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.lang-flag {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: 6px;
+  padding: 3px 5px;
+  cursor: pointer;
+  line-height: 0;
+  opacity: 0.5;
+  transition: opacity 0.15s, border-color 0.15s, background 0.15s;
+}
+.lang-flag:hover {
+  opacity: 0.8;
+  background: var(--surface3);
+}
+.lang-flag.active {
+  opacity: 1;
+  border-color: var(--accent);
+  background: var(--surface3);
+}
+
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+  max-width: 400px;
+}
+
+#search {
+  width: 100%;
+  padding: 7px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+#search:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+#search::placeholder { color: var(--text-dim); }
+
+.search-clear {
+  display: none;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  line-height: 1;
+  border-radius: 4px;
+}
+
+.search-clear:hover {
+  color: var(--text);
+  background: var(--surface3);
+}
+
+.search-wrap.has-text .search-clear { display: block; }
+.search-wrap.has-text #search { padding-right: 30px; }
+
+.search-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 500px;
+  overflow-y: auto;
+  background: var(--surface2);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  z-index: 200;
+  font-size: 13px;
+}
+
+.search-dropdown.visible { display: block; }
+
+.search-dropdown .sd-group {
+  border-bottom: 1px solid var(--border);
+}
+
+.search-dropdown .sd-group:last-child { border-bottom: none; }
+
+.search-dropdown .sd-group-header {
+  padding: 8px 12px 4px;
+  font-weight: 600;
+  color: var(--accent);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.search-dropdown .sd-group-count {
+  color: var(--text-dim);
+  font-weight: 400;
+  font-size: 11px;
+  margin-left: 6px;
+}
+
+.search-dropdown .sd-result {
+  padding: 6px 12px 6px 24px;
+  color: var(--text);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+}
+
+.search-dropdown .sd-result:hover {
+  background: var(--surface3);
+  border-left-color: var(--accent);
+}
+
+.search-dropdown .sd-result .sd-snippet {
+  color: var(--text-dim);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.search-dropdown .sd-empty {
+  padding: 16px 12px;
+  text-align: center;
+  color: var(--text-dim);
+}
+
+.search-dropdown .sd-row-count {
+  padding: 6px 12px 6px 24px;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* tab bar */
+#tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  max-width: var(--content-width);
+  margin: 0 auto;
+}
+
+.tab-btn {
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tab-btn:hover {
+  color: var(--text);
+}
+
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+
+/* tab content */
+.tab-content {
+  display: none;
+  padding: 24px;
+  max-width: var(--content-width);
+  margin: 0 auto;
+}
+
+.tab-content.active { display: block; }
+
+/* sections */
+.section {
+  margin-bottom: 32px;
+}
+
+/* is-empty: set by hideEmptySections() in app.js on sections with no data.
+   a class, not an inline style - the search filter clears inline display
+   values when it restores rows, which would show these again. */
+.section.is-empty,
+details.is-empty {
+  display: none;
+}
+
+/* auto-width: section shrinks to fit table content, centered on page.
+   Used with paginatedTable/sortableTable autoWidth option.
+   white-space:nowrap on td/th prevents wrapping so the table is exactly
+   as wide as its content - no wider, no narrower. */
+.section.auto-width {
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.section.auto-width table {
+  width: auto;
+}
+.section.auto-width td,
+.section.auto-width th {
+  white-space: nowrap;
+}
+.section.auto-width td.wrap-cell,
+.section.auto-width th.wrap-cell {
+  white-space: normal;
+  word-break: break-word;
+}
+/* wrap-cell for non-auto-width tables (e.g. storage breakdown) */
+td.wrap-cell,
+th.wrap-cell {
+  white-space: normal;
+  word-break: break-word;
+}
+/* inside a flex container, the container handles centering via justify-content.
+   Reset the auto margins so sections sit flush in the flex layout. */
+.auto-width-wrap > .section.auto-width {
+  margin-left: 0;
+  margin-right: 0;
+}
+/* train details: Route column (5th) hidden by default because routes can be
+   very long (50+ stops). Toggle button adds .routes-expanded class to show. */
+.section.train-details:not(.routes-expanded) table th:nth-child(5),
+.section.train-details:not(.routes-expanded) table td:nth-child(5) {
+  display: none;
+}
+.train-route-btn {
+  margin-left: auto;
+  padding: 2px 10px;
+  font-size: 0.85em;
+  cursor: pointer;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-bright);
+}
+.train-route-btn:hover {
+  background: var(--surface3);
+}
+.map-link-btn {
+  padding: 2px 6px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-bright);
+}
+.map-link-btn:hover {
+  background: var(--surface3);
+  border-color: var(--accent);
+}
+/* card-section: overrides the default CSS grid layout with flexbox so cards
+   center as a group and the h2 header width can be synced to the card row
+   width by syncCardHeaders() in dom.js. Cards stay fixed at 230px. */
+.section.card-section > .card-grid {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  grid-template-columns: none !important;
+  width: fit-content;
+  margin: 0 auto 12px;
+}
+.section.card-section > .card-grid > .card {
+  width: 230px;
+  max-width: 230px;
+}
+.section.card-section > h2 {
+  text-align: center;
+  margin: 0 auto 14px;
+  white-space: nowrap;
+}
+.sync-text-header > h2,
+.sync-details-header > h2 {
+  text-align: center;
+  margin: 0 auto 14px;
+  white-space: nowrap;
+}
+
+.section h2 {
+  font-size: 1.05em;
+  color: var(--text-bright);
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+}
+
+/* Overview tab: same flexbox centering as .card-section but applied directly
+   to all card grids in the overview tab (which doesn't use the card-section
+   class - it predates the helper). */
+#tab-overview .card-grid {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  grid-template-columns: none !important;
+  margin: 0 auto 12px;
+}
+#tab-overview .card-grid > .card {
+  width: 230px;
+  max-width: 230px;
+}
+
+/* tab description box: info text at the top of each tab. Shrinks to fit
+   content and centers on the page. Gold info icon (ⓘ) on the left. */
+.tab-description {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: 12px 12px;
+  margin-bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  width: fit-content;
+  max-width: 100%;
+  font-size: 1em;
+  font-weight: 500;
+  color: var(--text-bright);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.tab-description .icon {
+  color: #fbbf24;
+  font-size: 1.2em;
+  flex-shrink: 0;
+}
+
+/* Default card grid: auto-fill layout. When inside a .card-section, the
+   rules above override this to flexbox centering. */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: 12px 14px;
+  transition: border-color 0.15s;
+}
+
+.card:hover {
+  border-color: var(--border-light);
+}
+
+.card .label {
+  font-size: 0.72em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-weight: 600;
+}
+
+.card .value {
+  font-size: 1.35em;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin: 3px 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.card .desc {
+  font-size: 0.78em;
+  color: var(--text-dim);
+}
+
+.card .card-time {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-bright);
+}
+
+/* tables: border-collapse for clean borders, border-radius via overflow:hidden
+   on the wrapping element (border-radius on table itself doesn't clip content) */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+table.cols-fixed {
+  table-layout: fixed;
+}
+
+/* sticky table headers: stay visible when scrolling inside .scrollable
+   containers. z-index:1 is below the page-level sticky-header (z-index:100). */
+thead th {
+  background: var(--surface2);
+  color: var(--text-dim);
+  text-align: left;
+  padding: 8px 14px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+thead th:hover { color: var(--accent); }
+
+thead th.sort-asc::after,
+thead th.sort-desc::after {
+  content: " \25B2";
+  color: var(--accent);
+  position: absolute;
+  margin-left: 2px;
+}
+thead th.sort-desc::after { content: " \25BC"; }
+
+tbody td {
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+tbody td.mono {
+  font-family: 'Consolas', 'SF Mono', 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+
+tbody tr:hover { background: var(--surface2); }
+
+/* row icons: 20px inline icons next to building/item names in table cells */
+.row-icon {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  margin-right: 4px;
+  border-radius: 2px;
+  object-fit: contain;
+}
+
+/* scrollable tables: max-height with vertical scroll. Used when a table
+   has many rows but pagination isn't desired (e.g. sortableTable with
+   scrollable option). */
+.scrollable {
+  max-height: 600px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.scrollable table {
+  border: none;
+  border-radius: 0;
+}
+
+/* badges: small colored pills for status/warning indicators.
+   Colors map to semantic states: green=ok, red=error, yellow=warning,
+   blue=info, orange=caution, purple=slooped, gray=neutral. */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.78em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge.green { background: var(--green-dim); color: var(--green); border: 1px solid var(--green); }
+.badge.orange { background: var(--orange-dim); color: var(--orange); border: 1px solid var(--orange); }
+.badge.red { background: var(--red-dim); color: var(--red); border: 1px solid var(--red); }
+.badge.yellow { background: var(--yellow-dim); color: var(--yellow); border: 1px solid var(--yellow); }
+.badge.blue { background: var(--blue-dim); color: #60a5fa; border: 1px solid var(--blue); }
+.badge.gray { background: var(--surface3); color: var(--text-dim); border: 1px solid var(--border-light); }
+.badge.purple { background: var(--purple-dim); color: var(--purple); border: 1px solid var(--purple); }
+
+/* progress bars */
+.bar-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 20px;
+  background: var(--surface3);
+  border-radius: 4px;
+  overflow: hidden;
+  min-width: 80px;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.bar-label {
+  position: absolute;
+  right: 6px;
+  font-size: 0.72em;
+  color: var(--text);
+  text-shadow: 0 0 4px rgba(0,0,0,0.8);
+  font-weight: 600;
+}
+
+/* details/accordion: used for collapsible sections like recipe production
+   breakdowns and clock speed distributions. Native HTML <details> element. */
+details {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  padding: 8px 14px;
+}
+
+details summary {
+  cursor: pointer;
+  color: var(--text);
+  font-weight: 600;
+  padding: 4px 0;
+  font-size: 0.95em;
+}
+
+details summary:hover { color: var(--accent); }
+
+details[open] { padding-bottom: 12px; }
+
+details > table, details > .scrollable {
+  margin-top: 10px;
+}
+
+/* fixed widths so <details> tile evenly in a flex-wrap row. the current tab
+   layouts depend on these numbers, don't change them.
+   .det-narrow = Clock Speeds;  .det-compact = Collectibles;  .det-wide = Manufacturing. */
+.det-narrow { min-width: 580px; max-width: 580px; width: 580px; }
+.det-compact { min-width: 390px; max-width: 390px; width: 390px; }
+.det-wide { min-width: 900px; max-width: 900px; width: 900px; }
+
+/* stat rows */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-row .label { color: var(--text-dim); }
+.stat-row .value { font-weight: 600; }
+
+.stat-row.overclocked .value { color: var(--red); }
+.stat-row.underclocked .value { color: #60a5fa; }
+
+/* empty state */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-dim);
+  font-size: 1.1em;
+}
+
+/* map tab — full width, no max-width constraint */
+#tab-map.tab-content {
+  max-width: none;
+  padding: 0;
+  height: calc(100vh - 80px);
+  overflow: hidden;
+}
+.map-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.map-controls {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(20, 20, 20, 0.92);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  max-height: calc(100% - 16px);
+  overflow-y: auto;
+  border: 1px solid #333;
+  z-index: 10;
+  min-width: 160px;
+}
+.map-controls label {
+  display: block;
+  cursor: pointer;
+  padding: 2px 0;
+  color: #ccc;
+}
+.map-controls input[type="checkbox"] {
+  margin-right: 4px;
+}
+.map-controls select {
+  width: 100%;
+  background: #222;
+  color: #ccc;
+  border: 1px solid #444;
+  padding: 2px;
+  border-radius: 3px;
+}
+.map-controls button {
+  width: 100%;
+  padding: 4px;
+  background: #333;
+  color: #ccc;
+  border: 1px solid #555;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.map-controls button:hover {
+  background: #444;
+}
+.map-info {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(20, 20, 20, 0.92);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #aaa;
+  border: 1px solid #333;
+  z-index: 10;
+  pointer-events: none;
+}
+.map-back-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(20, 20, 20, 0.92);
+  color: #ccc;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  z-index: 10;
+}
+.map-back-btn:hover {
+  background: #333;
+  color: #fff;
+}
+.map-tooltip {
+  position: absolute;
+  background: rgba(15, 15, 15, 0.95);
+  border: 1px solid #555;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: #ddd;
+  z-index: 15;
+  pointer-events: none;
+  min-width: 160px;
+  max-width: 280px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+.map-tooltip .mt-name {
+  font-weight: bold;
+  font-size: 13px;
+  color: #fff;
+  margin-bottom: 2px;
+}
+.map-tooltip .mt-cat {
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.map-tooltip .mt-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 1px 0;
+}
+.map-tooltip .mt-row span:first-child {
+  color: #888;
+}
+.map-tooltip .mt-row span:last-child {
+  color: #ccc;
+  text-align: right;
+}
+.map-tooltip.mt-pinned {
+  border-color: #ffcc00;
+  box-shadow: 0 0 8px rgba(255,204,0,0.4);
+  pointer-events: auto;
+  cursor: auto;
+  user-select: text;
+}
+.map-tooltip .mt-close {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  cursor: pointer;
+  color: #888;
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+.map-tooltip .mt-close:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.15);
+}
+
+/* filter bars */
+.filter-bar {
+  margin-bottom: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-bar input[type="text"],
+.filter-bar select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 5px 10px;
+  transition: border-color 0.15s;
+}
+
+.filter-bar input[type="text"] {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-bar .filter-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-bar .filter-input-wrap input[type="text"] {
+  width: 100%;
+}
+
+.filter-clear {
+  display: none;
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 15px;
+  cursor: pointer;
+  padding: 1px 5px;
+  line-height: 1;
+  border-radius: 4px;
+}
+
+.filter-clear:hover {
+  color: var(--text);
+  background: var(--surface3);
+}
+
+.filter-input-wrap.has-text .filter-clear { display: block; }
+.filter-input-wrap.has-text input[type="text"] { padding-right: 28px; }
+
+.filter-bar input[type="text"]:focus,
+.filter-bar select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.filter-bar input[type="text"]::placeholder { color: var(--text-dim); }
+
+.filter-bar select option {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.filter-bar button {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 5px 12px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.filter-bar button:hover:not(:disabled) {
+  background: var(--surface3);
+  border-color: var(--border-light);
+}
+
+.filter-bar button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* pager */
+.pager-bar {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pager-bar .pager-info {
+  font-size: 0.85em;
+  color: var(--text-dim);
+}
+
+.pager-bar .pager-buttons {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.pager-bar button {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 4px 12px;
+  transition: background 0.15s;
+}
+
+.pager-bar button:hover:not(:disabled) {
+  background: var(--surface3);
+}
+
+.pager-bar button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pager-bar .pager-page {
+  padding: 0 8px;
+  font-size: 0.85em;
+  color: var(--text-dim);
+}
+
+/* footer */
+footer {
+  text-align: center;
+  padding: 16px 24px;
+  color: var(--text-dim);
+  font-size: 0.8em;
+  border-top: 1px solid var(--border);
+  max-width: var(--content-width);
+  margin: 0 auto;
+}
+
+/* responsive: on narrow screens, force 2-column card grids and reduce
+   padding. Tables with auto-width will naturally scroll horizontally. */
+@media (max-width: 768px) {
+  .card-grid { grid-template-columns: 1fr 1fr; }
+  .tab-content { padding: 14px; }
+  #tabs { padding: 0 14px; }
+  header { padding: 8px 14px; }
+  #search { max-width: none; }
+  .search-wrap { max-width: none; }
+}

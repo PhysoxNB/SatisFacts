@@ -4,70 +4,70 @@ import "fmt"
 
 // SaveHeaderType constants
 const (
-	HeaderInitialVersion          = 0
-	HeaderPrepareForLoadingMaps   = 1
-	HeaderAddedSessionId          = 2
-	HeaderAddedPlayDuration       = 3
-	HeaderSessionIDStringAndSave  = 4
-	HeaderAddedSessionVisibility  = 5
-	HeaderLookAtTheComment        = 6 // checksum field
-	HeaderUE425EngineUpdate       = 7 // fEditorObjectVersion
-	HeaderAddedModdingParams      = 8
-	HeaderUE426EngineUpdate       = 9
-	HeaderAddedSaveIdentifier     = 10
-	HeaderAddedWorldPartition     = 11
-	HeaderAddedSaveModChecksum    = 12
-	HeaderAddedIsCreativeMode     = 13
-	HeaderAddedSaveName           = 14
+	HeaderInitialVersion         = 0
+	HeaderPrepareForLoadingMaps  = 1
+	HeaderAddedSessionId         = 2
+	HeaderAddedPlayDuration      = 3
+	HeaderSessionIDStringAndSave = 4
+	HeaderAddedSessionVisibility = 5
+	HeaderLookAtTheComment       = 6 // checksum field
+	HeaderUE425EngineUpdate      = 7 // fEditorObjectVersion
+	HeaderAddedModdingParams     = 8
+	HeaderUE426EngineUpdate      = 9
+	HeaderAddedSaveIdentifier    = 10
+	HeaderAddedWorldPartition    = 11
+	HeaderAddedSaveModChecksum   = 12
+	HeaderAddedIsCreativeMode    = 13
+	HeaderAddedSaveName          = 14
 )
 
 // SaveVersion constants
 const (
-	SaveSerializeObjectFlags              = 41
-	SaveUnrealEngine5                     = 37
-	SaveIntroducedWorldPartition          = 38
-	SaveSerializePerStreamableLevelTOC    = 51
-	SaveSerializeDataPackageAndCustomVer  = 53
+	SaveSerializeObjectFlags             = 41
+	SaveUnrealEngine5                    = 37
+	SaveIntroducedWorldPartition         = 38
+	SaveSerializePerStreamableLevelTOC   = 51
+	SaveSerializeDataPackageAndCustomVer = 53
 )
 
 // SaveHeader holds the parsed save-file header.
 type SaveHeader struct {
-	SaveHeaderType    int32
-	SaveVersion       int32
-	BuildVersion      int32
-	SaveName          string
-	MapName           string
-	MapOptions        string
-	SessionName       string
-	PlayDurationSeconds int32
-	SaveDateTime      string // Unix milliseconds as string
-	SessionVisibility uint8
+	SaveHeaderType       int32
+	SaveVersion          int32
+	BuildVersion         int32
+	SaveName             string
+	MapName              string
+	MapOptions           string
+	SessionName          string
+	PlayDurationSeconds  int32
+	SaveDateTime         string // Unix milliseconds as string
+	SessionVisibility    uint8
 	FEditorObjectVersion int32
 	RawModMetadataString string
-	IsModdedSave      int32
-	SaveIdentifier    string
+	IsModdedSave         int32
+	SaveIdentifier       string
 	PartitionEnabledFlag int32
-	CreativeModeEnabled int32
-	ExtraField        int32
+	CreativeModeEnabled  int32
+	ExtraField           int32
 }
 
 // VersionContext carries the version numbers we branch on while parsing.
 type VersionContext struct {
-	HeaderVersion  int32
-	SaveVersion    int32
-	BuildVersion   int32
-	LevelVersion   int32
-	ObjectVersion  int32
+	HeaderVersion     int32
+	SaveVersion       int32
+	BuildVersion      int32
+	LevelVersion      int32
+	ObjectVersion     int32
 	PackageFileVerUE5 int32
 }
 
 func NewVersionContext(header *SaveHeader) *VersionContext {
 	return &VersionContext{
-		HeaderVersion:  header.SaveHeaderType,
-		SaveVersion:    header.SaveVersion,
-		BuildVersion:   header.BuildVersion,
-		LevelVersion:   header.SaveVersion, // starts equal to the save version
-		ObjectVersion:  header.SaveVersion,
+		HeaderVersion:     header.SaveHeaderType,
+		SaveVersion:       header.SaveVersion,
+		BuildVersion:      header.BuildVersion,
+		LevelVersion:      header.SaveVersion, // starts equal to the save version
+		ObjectVersion:     header.SaveVersion,
 		PackageFileVerUE5: 0,
 	}
 }
@@ -75,7 +75,7 @@ func NewVersionContext(header *SaveHeader) *VersionContext {
 func (c *VersionContext) HeaderIsAtLeast(v int32) bool { return c.HeaderVersion >= v }
 func (c *VersionContext) SaveIsAtLeast(v int32) bool   { return c.SaveVersion >= v }
 func (c *VersionContext) LevelIsAtLeast(v int32) bool  { return c.LevelVersion >= v }
-func (c *VersionContext) HasObjectFlags() bool          { return c.SaveIsAtLeast(SaveSerializeObjectFlags) }
+func (c *VersionContext) HasObjectFlags() bool         { return c.SaveIsAtLeast(SaveSerializeObjectFlags) }
 
 // Clone makes a shallow copy.
 func (c *VersionContext) Clone() *VersionContext {
@@ -146,7 +146,8 @@ func ParseHeader(r *BinaryReader) (*SaveHeader, *VersionContext, error) {
 		header.CreativeModeEnabled = r.ReadInt32()
 	}
 
-	// Checksum (version >= 6)
+	// Checksum (version >= 6). Always a raw 16-byte hash; it never grew a
+	// bIsValid prefix, so this stays 16 bytes for every header version.
 	if ctx.HeaderIsAtLeast(HeaderLookAtTheComment) {
 		r.ReadBytes(16) // 16-byte consistency hash
 	}
@@ -156,7 +157,7 @@ func ParseHeader(r *BinaryReader) (*SaveHeader, *VersionContext, error) {
 		header.ExtraField = r.ReadInt32()
 	}
 
-	// Creative mode (version >= 7), except v13 which we already handled.
+	// Creative mode (version >= 13), except v13 which we already handled above.
 	if ctx.HeaderIsAtLeast(HeaderAddedIsCreativeMode) && header.SaveHeaderType != 13 {
 		header.CreativeModeEnabled = r.ReadInt32()
 	}

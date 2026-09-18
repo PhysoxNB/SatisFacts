@@ -7,9 +7,9 @@ import (
 
 // Body is the top-level metadata we pull out of the body structure.
 type Body struct {
-	TotalSize      int32
-	SublevelCount  int32
-	LevelCount     int32
+	TotalSize     int32
+	SublevelCount int32
+	LevelCount    int32
 }
 
 // ObjectRef is an FObjectReferenceDisc
@@ -27,30 +27,30 @@ type Transform3f struct {
 
 // ObjectHeader is one object's header straight out of the TOC blob.
 type ObjectHeader struct {
-	Type           string // "Actor" or "Object"
-	ClassName      string
-	Reference      ObjectRef
-	ObjectFlags    uint32 // if SaveVersion >= 49
-	NeedTransform  bool
-	Transform      Transform3f
+	Type             string // "Actor" or "Object"
+	ClassName        string
+	Reference        ObjectRef
+	ObjectFlags      uint32 // if SaveVersion >= 49
+	NeedTransform    bool
+	Transform        Transform3f
 	WasPlacedInLevel bool
-	OuterPathName  string // only for Object type
+	OuterPathName    string // only for Object type
 }
 
 // Level bundles a level's TOC headers with its data-blob info.
 type Level struct {
-	Name             string
-	IsPersistent     bool
-	TOCBlobLength    int64
-	DataBlobLength   int64
+	Name              string
+	IsPersistent      bool
+	TOCBlobLength     int64
+	DataBlobLength    int64
 	ObjectHeaderCount int32
-	ObjectHeaders    []ObjectHeader
-	SaveVersion      int32
+	ObjectHeaders     []ObjectHeader
+	SaveVersion       int32
 	// Collectables1 is the list of collected/dismantled collectible
 	// references embedded in the TOC blob after the object headers.
 	// These are ObjectReferences to actors that were picked up by the
 	// player (power slugs, somersloops, mercer spheres, crash sites).
-	Collectables1    []ObjectRef
+	Collectables1 []ObjectRef
 }
 
 // BodyParser walks the decompressed save body.
@@ -333,27 +333,34 @@ func (b *BodyParser) readLevelFooter(level *Level, isPersistent bool) error {
 
 	if isPersistent {
 		// Persistent level carries the destroyed-actors map.
+		// Some third-party tools (e.g. SCIM) truncate this footer, leaving
+		// only a partial or missing destroyed-actors map. The game tolerates
+		// this, so we do too - log a warning and continue on read errors.
 		mapCount, err := b.reader.ReadInt32()
 		if err != nil {
-			return err
+			log.Printf("Warning: could not read destroyed actors count: %v (continuing)", err)
+			return nil
 		}
 		if mapCount < 0 || mapCount > 1000000 {
 			log.Printf("Warning: Suspicious destroyed actors count: %d", mapCount)
 		} else {
 			for i := int32(0); i < mapCount; i++ {
 				if _, err := b.reader.ReadString(); err != nil {
-					return err
+					log.Printf("Warning: destroyed actors map truncated at entry %d/%d (continuing)", i, mapCount)
+					return nil
 				}
 				arrayCount, err := b.reader.ReadInt32()
 				if err != nil {
-					return err
+					log.Printf("Warning: destroyed actors map truncated at entry %d/%d (continuing)", i, mapCount)
+					return nil
 				}
 				if arrayCount < 0 || arrayCount > 100000 {
 					continue
 				}
 				for j := int32(0); j < arrayCount; j++ {
 					if _, err := b.readObjectRef(); err != nil {
-						return err
+						log.Printf("Warning: destroyed actors map truncated at entry %d/%d (continuing)", i, mapCount)
+						return nil
 					}
 				}
 			}

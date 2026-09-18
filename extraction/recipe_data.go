@@ -25,7 +25,7 @@ var recipeMap map[string]*Recipe
 
 // LoadRecipes loads recipes from the embedded JSON file.
 func LoadRecipes(path string) error {
-	data, err := dataFilesFS.ReadFile("data/recipes.json")
+	data, err := dataFilesFS.ReadFile("report/data/recipes.json")
 	if err != nil {
 		return err
 	}
@@ -47,6 +47,19 @@ func GetPerCycleOutputs(recipePath string) []RecipeProduct {
 		return nil
 	}
 	return recipe.Products
+}
+
+// GetRecipeIngredients returns a recipe's ingredients, or nil if we don't
+// know the recipe or it has no ingredients.
+func GetRecipeIngredients(recipePath string) []RecipeProduct {
+	if recipePath == "" || recipeMap == nil {
+		return nil
+	}
+	recipe, ok := recipeMap[recipePath]
+	if !ok || recipe.Ingredients == nil {
+		return nil
+	}
+	return recipe.Ingredients
 }
 
 // Stack size -> the items that stack to that size.

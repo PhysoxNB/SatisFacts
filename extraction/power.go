@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -12,10 +11,10 @@ var generatorTypeRegex = regexp.MustCompile(`Build_Generator(\w+)`)
 
 // generatorBasePower maps generator type names to their base power output at 100% clock speed.
 var generatorBasePower = map[string]float64{
-	"coal":      75.0,
-	"fuel":      250.0,
-	"nuclear":   2500.0,
-	"biomass":   30.0,
+	"coal":       75.0,
+	"fuel":       250.0,
+	"nuclear":    2500.0,
+	"biomass":    30.0,
 	"geothermal": 0, // variable, calculated from actual production
 }
 
@@ -33,11 +32,23 @@ func getGeneratorBasePower(typeLower string) float64 {
 func ExtractGeneratorPower(buildingTypes map[string]string, buildingFacts map[string]*BuildingFacts, resourceNodeFacts map[string]*ResourceNodeFacts, inventoryStacks map[string][]InventoryStack) GeneratorPowerData {
 	data := GeneratorPowerData{}
 
-	for instanceName, typePath := range buildingTypes {
+	// Sorted so the generator list and the running totals come out the same on
+	// every run - float addition isn't associative, so even the MW sums drift
+	// by a ULP if the order changes.
+	for _, instanceName := range sortedKeys(buildingTypes) {
+		typePath := buildingTypes[instanceName]
 		typeLower := strings.ToLower(typePath)
 
-		// Check if this is a generator
+		// Check if this is a generator: either by class name, or by having
+		// mBaseProduction > 0 in the power info (catches modded generators
+		// like RefinedPower WaterTurbine/WaterDam/MicroReactor whose class
+		// names don't contain "generator").
 		isGenerator := strings.Contains(typeLower, "generator") || strings.Contains(typeLower, "biomass")
+		if !isGenerator {
+			if bf, ok := buildingFacts[instanceName]; ok && bf != nil && bf.HasBaseProduction && bf.BaseProduction > 0 {
+				isGenerator = true
+			}
+		}
 		if !isGenerator {
 			continue
 		}
@@ -72,6 +83,14 @@ func ExtractGeneratorPower(buildingTypes map[string]string, buildingFacts map[st
 			maxMW = float64(bf.BaseProduction)
 		} else if actualMW > 0 {
 			maxMW = actualMW
+		}
+		// Modded generators (e.g. MkPlus nuclear) may not store mBaseProduction.
+		// Fall back to the known base power for this generator type.
+		if maxMW == 0 {
+			basePower := getGeneratorBasePower(typeLower)
+			if basePower > 0 {
+				maxMW = basePower
+			}
 		}
 		// Geothermal: no mDynamicProductionCapacity
 		if !bf.HasDynamicProductionCapacity {
@@ -117,13 +136,17 @@ func ExtractGeneratorPower(buildingTypes map[string]string, buildingFacts map[st
 			data.StandbyGenerators++
 			data.StandbyCapacityMW += maxMW
 		} else if actualMW < maxMW*0.95 {
-			status = "Active"
+			status = "Running"
 			reason = "Fuel-Starved"
 			data.ActiveGenerators++
 			data.ActiveCapacityMW += actualMW
 		} else {
-			status = "Active"
-			reason = "Producing"
+			status = "Running"
+			clockPct := 100.0
+			if bf.HasCurrentPotential && bf.CurrentPotential > 0 {
+				clockPct = float64(bf.CurrentPotential) * 100.0
+			}
+			reason = "Producing at " + fmt.Sprintf("%.0f%%", clockPct) + " clock"
 			data.ActiveGenerators++
 			data.ActiveCapacityMW += actualMW
 		}
@@ -161,25 +184,26 @@ func ExtractGeneratorPower(buildingTypes map[string]string, buildingFacts map[st
 		if bf.HasTransform {
 			pos := bf.Translation
 			genLoc = &ConsumerLocation{
-				X: formatLocationNum(float64(pos[0]) / 100.0),
-				Y: formatLocationNum(float64(pos[1]) / 100.0),
-				Z: formatLocationNum(float64(pos[2]) / 100.0),
+				X: int(float64(pos[0]) / 100.0),
+				Y: int(float64(pos[1]) / 100.0),
+				Z: int(float64(pos[2]) / 100.0),
 			}
 		}
 
 		data.Generators = append(data.Generators, GeneratorEntry{
-			InstanceName:     instanceName,
-			Type:             generatorType,
-			TypePath:         typePath,
-			Status:           status,
-			ActualMW:         actualMW,
-			MaxMW:            maxMW,
-			TheoreticalMaxMW: theoreticalMaxMW,
-			Reason:           reason,
-			OutputPercent:    outputPercent,
-			FuelType:         fuelType,
-			PowerShardCount:  powerShardCount,
-			Location:         genLoc,
+			InstanceName:             instanceName,
+			Type:                     generatorType,
+			TypePath:                 typePath,
+			Status:                   status,
+			ActualMW:                 actualMW,
+			MaxMW:                    maxMW,
+			TheoreticalMaxMW:         theoreticalMaxMW,
+			Reason:                   reason,
+			OutputPercent:            outputPercent,
+			FuelType:                 fuelType,
+			PowerShardCount:          powerShardCount,
+			Location:                 genLoc,
+			VariablePowerCycleOffset: bf.VariablePowerCycleOffset,
 		})
 	}
 
@@ -222,17 +246,81 @@ func extractFuelType(bf *BuildingFacts, resourceNodeFacts map[string]*ResourceNo
 
 var buildingTypeRegex = regexp.MustCompile(`Build_(\w+)`)
 
-// getConsumerBasePower looks up the base power consumption for a building type from power_data.json
+// getConsumerBasePower looks up the base power consumption for a building type from power_data.json.
+// Longer keys are checked first so "PipelinePumpMk2" matches before "PipelinePump".
 func getConsumerBasePower(typeLower string) float64 {
 	if powerDataLoaded == nil {
 		return 0
 	}
+	var bestKey string
+	var bestMW float64
 	for key, cd := range powerDataLoaded.Consumers {
-		if strings.Contains(typeLower, strings.ToLower(key)) {
-			return cd.BaseMW
+		lk := strings.ToLower(key)
+		if strings.Contains(typeLower, lk) {
+			if len(lk) > len(bestKey) {
+				bestKey = lk
+				bestMW = cd.BaseMW
+			}
 		}
 	}
-	return 0
+	return bestMW
+}
+
+// What a locomotive pulls when it's flat out accelerating. We only use this to
+// show the top of the range in the report, never as a counted value. The 25 MW
+// minimum lives in power_data.json with the rest of the building numbers.
+const locomotiveMaxDrawMW = 110.0
+
+// railBuildingKind picks out the rail buildings the normal producer logic
+// can't cope with. Returns "" for everything else.
+func railBuildingKind(typeLower string) string {
+	switch {
+	case strings.Contains(typeLower, "build_trainstation"):
+		return "station"
+	case strings.Contains(typeLower, "traindockingstation"):
+		return "platform"
+	}
+	return ""
+}
+
+// railPowerStatus works out consumption and status for train stations and
+// freight platforms.
+//
+// They need their own path for two reasons. There's no recipe and no
+// mIsProducing on them, so the producer logic below sees the 0.1 MW idle draw,
+// decides they're "Paused" and throws the number away. And they're fed off the
+// third rail, so WireCount is no help in deciding if they're powered.
+//
+// The MW values are straight from the save: a platform reports 50 MW while a
+// transfer is actually running and 0.1 MW the rest of the time, a station just
+// sits at 0.1 MW. The 50 MW a station shows on the in-game power graph is its
+// rating, not what it's really pulling.
+func railPowerStatus(kind string, currentMW, ratedMW float64, bf *BuildingFacts) (actualMW, maxMW float64, status, reason string) {
+	maxMW = ratedMW
+	if maxMW <= 0 {
+		maxMW = -1
+	}
+
+	if bf.HasCircuit && !bf.CircuitHasGenerator {
+		return 0, maxMW, "Unpowered", "On a rail circuit with no power source"
+	}
+	if !bf.HasCircuit && bf.WireCount == 0 {
+		return 0, maxMW, "Unpowered", "Not connected to a power circuit or rail network"
+	}
+
+	actualMW = currentMW
+	busy := ratedMW > 0 && currentMW >= ratedMW*0.5
+
+	if kind == "platform" {
+		if busy {
+			return actualMW, maxMW, "Running", "Transferring cargo"
+		}
+		return actualMW, maxMW, "Idle", "Powered, no cargo transfer"
+	}
+	if busy {
+		return actualMW, maxMW, "Running", "Train docked"
+	}
+	return actualMW, maxMW, "Idle", "Powered, waiting for a train"
 }
 
 // expectedConsumerPower calculates expected power consumption at a given clock speed.
@@ -247,25 +335,37 @@ func expectedConsumerPower(baseMW float64, clockSpeedPct float32) float64 {
 
 // isNonPowerConsumer returns true for buildings that have mPowerInfo but never consume power.
 func isNonPowerConsumer(typeLower string) bool {
+	// Pipe pumps consume power – check before "pipeline" catches them.
+	if strings.Contains(typeLower, "pipelinepump") || strings.Contains(typeLower, "pipepump") {
+		return false
+	}
+	// ResourceSinkShop is where you buy coupons, not a power consumer.
+	if strings.Contains(typeLower, "resourcesinkshop") {
+		return true
+	}
 	nonPower := []string{
 		"storage", "container", "tank", "dimdepot", "centralstorage",
-		"pipelinejunction", "pipeconnection", "fgpipe",
+		"pipeline", "pipelinejunction", "pipeconnection", "fgpipe", "valve",
 		"conveyormerger", "conveyorsplitter", "programmable", "smart",
 		"passthrough", "wallhole", "floorhole",
 		"powerpole", "powertower", "powerline", "powerswitch",
 		"powerstorage",
 		"tradingpost", "tradestation",
-		"hub", "elevator", "spacelevator",
-		"portal", "sink", "awesomesink",
+		"hub", "spacelevator",
 		"blueprintdesigner",
 		"sign", "lamp", "light", "beacon",
 		"door", "wall", "foundation", "ramp", "walkway", "roof",
 		"beam", "pillar", "barrier", "gate",
 		"conveyorbelt", "conveyorlift",
-		"pipeline", "pipepump", "pipesupport",
+		"pipesupport",
 		"hypertube", "hyper",
 		"railroad", "rail", "switch", "signal",
-		"truckstation", "freightplatform",
+		"truckstation",
+		// Empty platforms have power info but always report 0 MW.
+		// Freight platforms and train stations are not in this list anymore –
+		// they report real numbers. See railPowerStatus.
+		"trainplatformempty",
+		"frackingextractor", // powered via FrackingSmasher, not on its own
 		"vehiclepathnode",
 		"jumppad", "launchpad",
 		"ladder", "stairs",
@@ -289,10 +389,13 @@ func ExtractPowerConsumption(
 	clockSpeeds map[string]float32,
 	productionBoosts map[string]float32,
 	extractorProgress map[string]float32,
+	buildingConnections map[string]BuildingConnection,
 ) PowerConsumptionData {
 	data := PowerConsumptionData{}
 
-	for instanceName, bf := range buildingFacts {
+	// Sorted for the same reason as the generator loop above.
+	for _, instanceName := range sortedKeys(buildingFacts) {
+		bf := buildingFacts[instanceName]
 		if bf == nil {
 			continue
 		}
@@ -300,13 +403,18 @@ func ExtractPowerConsumption(
 		typePath := bf.TypePath
 		typeLower := strings.ToLower(typePath)
 
-		// Skip generators — we only want consumers
+		// Skip generators - we only want consumers
 		if strings.Contains(typeLower, "generator") {
 			continue
 		}
 
 		// Must have mPowerInfo to be a power consumer
 		if bf.PowerInfoRef == "" {
+			continue
+		}
+
+		// Skip buildings that have mPowerInfo but never actually consume power
+		if isNonPowerConsumer(typeLower) {
 			continue
 		}
 
@@ -330,6 +438,11 @@ func ExtractPowerConsumption(
 			strings.Contains(typeLower, "oilpump") || strings.Contains(typeLower, "fracking") ||
 			strings.Contains(typeLower, "resourcewell")
 
+		// Check if the building actually has a recipe set. Buildings without
+		// mCurrentRecipe (sinks, elevators, unconfigured machines) have no entry
+		// in buildingRecipes, so the map lookup returns "".
+		hasNoRecipe := buildingRecipes[instanceName] == ""
+
 		// Check inventory to determine actual state (starving, blocked, or running)
 		buildingInventory, hasInventoryData := resolvedInventories[instanceName]
 		isStarving := false
@@ -340,10 +453,24 @@ func ExtractPowerConsumption(
 			if !isExtractor {
 				hasInput := len(buildingInventory.InputStacks) > 0
 				totalInputCount := float64(0)
+				filledInputSlots := 0
 				for _, stack := range buildingInventory.InputStacks {
 					totalInputCount += stack.Count
+					if stack.Count > 0 {
+						filledInputSlots++
+					}
 				}
 				isStarving = !hasInput || totalInputCount == 0
+
+				// If we know the recipe, also check that enough distinct input
+				// slots are filled. A recipe with 2 ingredients needs 2 filled
+				// slots - having only one (e.g. Crude Oil but no Empty Canister)
+				// means the building is starving.
+				recipePath := buildingRecipes[instanceName]
+				ingredients := GetRecipeIngredients(recipePath)
+				if ingredients != nil && filledInputSlots < len(ingredients) {
+					isStarving = true
+				}
 			}
 
 			// Check if output is full (blocked)
@@ -398,6 +525,14 @@ func ExtractPowerConsumption(
 			isBlocked = hasFullOutput
 		}
 
+		// Check if building has any output connections (belts or pipes)
+		conn, hasConn := buildingConnections[instanceName]
+		noOutputConnection := hasConn && len(conn.Outputs) == 0
+		blockedReason := "Output full (waiting for space)"
+		if noOutputConnection {
+			blockedReason = "No output belt/pipe connected"
+		}
+
 		// Process power consumption
 		var actualMW, maxMW float64
 		status := "Unknown"
@@ -426,25 +561,67 @@ func ExtractPowerConsumption(
 		// Consumption matching expected power (within 50%) means the building is running.
 		isRunningAtLowClock := expectedMW > 0 && currentMW >= expectedMW*0.5
 
-		if currentMW > 0 {
-			if !isActive && currentMW < 1.0 {
-				// Paused building with standby power
-				maxMW = -1
-				actualMW = 0
-				status = "Paused"
-				reason = "Manually paused or no recipe"
-			} else if isActive && isRunningAtLowClock {
-				// Building is running at low clock speed — consumption matches expected formula
+		// Check power connection - buildings with no wires are not connected to the grid
+		hasPowerConnection := bf.WireCount > 0
+
+		if railKind := railBuildingKind(typeLower); railKind != "" {
+			actualMW, maxMW, status, reason = railPowerStatus(railKind, currentMW, expectedMW, bf)
+		} else if !hasPowerConnection && currentMW == 0 {
+			// Not connected to power network
+			status = "Standby"
+			reason = "Not connected to power network"
+			if expectedMW > 0 {
 				maxMW = expectedMW
+			} else {
+				maxMW = -1 // sentinel: unknown building, but still show it
+			}
+		} else if currentMW > 0 {
+			if !isActive && currentMW < 1.0 {
+				// Paused building with standby power. Report the real draw
+				// (matches the "else" branch below, which does the same for
+				// Blocked/Starving buildings above this threshold) so the
+				// "Actual MW" column and TotalActualMW aren't silently
+				// undercounted just because the value happens to be small.
+				if expectedMW > 0 {
+					maxMW = expectedMW
+				} else {
+					maxMW = -1
+				}
+				actualMW = currentMW
+				if hasInventoryData && isBlocked {
+					status = "Blocked"
+					reason = blockedReason
+				} else if hasInventoryData && isStarving && !isExtractor && !hasNoRecipe {
+					status = "Starving"
+					reason = "No input items (waiting for material)"
+				} else {
+					status = "Paused"
+					if hasNoRecipe {
+						reason = "Manually paused or no recipe"
+					} else {
+						reason = "Manually paused"
+					}
+				}
+			} else if isActive && isRunningAtLowClock {
+				// Building is running at low clock speed - consumption matches expected formula.
+				// Some buildings (Converter, QuantumEncoder, HadronCollider) have recipe-dependent
+				// power that can exceed the base power in power_data.json. Use the higher of
+				// expected vs actual so theoretical max is never below current consumption.
+				maxMW = math.Max(expectedMW, currentMW)
 				actualMW = currentMW
 
 				if hasInventoryData {
 					if isBlocked {
 						status = "Blocked"
-						reason = "Output full (waiting for space)"
+						reason = blockedReason
 					} else if isStarving && !isExtractor {
-						status = "Starving"
-						reason = "No input items (waiting for material)"
+						if hasNoRecipe {
+							status = "Running"
+							reason = "Active"
+						} else {
+							status = "Starving"
+							reason = "No input items (waiting for material)"
+						}
 					} else {
 						status = "Running"
 						reason = "Producing at " + fmt.Sprintf("%.0f%%", clockSpeedPct) + " clock"
@@ -454,7 +631,7 @@ func ExtractPowerConsumption(
 						extractProgress, hasEP := extractorProgress[instanceName]
 						if hasEP && extractProgress < 0.1 {
 							status = "Blocked"
-							reason = "Output full (waiting for space)"
+							reason = blockedReason
 							isBlocked = true
 						} else {
 							status = "Running"
@@ -466,22 +643,33 @@ func ExtractPowerConsumption(
 					}
 				}
 			} else if isActive && currentMW < 0.5 {
-				// Active but consuming standby power (0.1 MW) — not actively producing
-				maxMW = -1
+				// Active but consuming standby power (0.1 MW) - not actively
+				// producing. Report the real draw (see comment on the
+				// Paused branch above).
+				if expectedMW > 0 {
+					maxMW = expectedMW
+				} else {
+					maxMW = -1
+				}
 				actualMW = currentMW
 
 				if hasInventoryData {
 					if isBlocked {
 						status = "Blocked"
-						reason = "Output full (waiting for space)"
+						reason = blockedReason
 					} else if isStarving && !isExtractor {
-						status = "Starving"
-						reason = "No input items (waiting for material)"
+						if hasNoRecipe {
+							status = "Running"
+							reason = "Active"
+						} else {
+							status = "Starving"
+							reason = "No input items (waiting for material)"
+						}
 					} else if isExtractor {
 						extractProgress, hasEP := extractorProgress[instanceName]
 						if hasEP && extractProgress < 0.1 {
 							status = "Blocked"
-							reason = "Output full (waiting for space)"
+							reason = blockedReason
 							isBlocked = true
 						} else {
 							status = "Idle"
@@ -497,7 +685,7 @@ func ExtractPowerConsumption(
 						extractProgress, hasEP := extractorProgress[instanceName]
 						if hasEP && extractProgress < 0.1 {
 							status = "Blocked"
-							reason = "Output full (waiting for space)"
+							reason = blockedReason
 							isBlocked = true
 						} else {
 							status = "Idle"
@@ -521,15 +709,20 @@ func ExtractPowerConsumption(
 					if hasInventoryData {
 						if isBlocked {
 							status = "Blocked"
-							reason = "Output full (waiting for space)"
+							reason = blockedReason
 						} else if isStarving && !isExtractor {
-							status = "Starving"
-							reason = "No input items (waiting for material)"
+							if hasNoRecipe {
+								status = "Running"
+								reason = "Active"
+							} else {
+								status = "Starving"
+								reason = "No input items (waiting for material)"
+							}
 						} else if isExtractor {
 							extractProgress, hasEP := extractorProgress[instanceName]
 							if hasEP && extractProgress < 0.1 {
 								status = "Blocked"
-								reason = "Output full (waiting for space)"
+								reason = blockedReason
 								isBlocked = true
 							} else {
 								status = "Running"
@@ -544,7 +737,7 @@ func ExtractPowerConsumption(
 							extractProgress, hasEP := extractorProgress[instanceName]
 							if hasEP && extractProgress < 0.1 {
 								status = "Blocked"
-								reason = "Output full (waiting for space)"
+								reason = blockedReason
 								isBlocked = true
 							} else {
 								status = "Running"
@@ -556,8 +749,20 @@ func ExtractPowerConsumption(
 						}
 					}
 				} else {
-					status = "Paused"
-					reason = "Manually paused or no recipe"
+					if hasInventoryData && isBlocked {
+						status = "Blocked"
+						reason = blockedReason
+					} else if hasInventoryData && isStarving && !isExtractor && !hasNoRecipe {
+						status = "Starving"
+						reason = "No input items (waiting for material)"
+					} else {
+						status = "Paused"
+						if hasNoRecipe {
+							reason = "Manually paused or no recipe"
+						} else {
+							reason = "Manually paused"
+						}
+					}
 				}
 			}
 		}
@@ -597,9 +802,9 @@ func ExtractPowerConsumption(
 		if bf.HasTransform {
 			pos := bf.Translation
 			loc = &ConsumerLocation{
-				X: formatLocationNum(float64(pos[0]) / 100.0),
-				Y: formatLocationNum(float64(pos[1]) / 100.0),
-				Z: formatLocationNum(float64(pos[2]) / 100.0),
+				X: int(float64(pos[0]) / 100.0),
+				Y: int(float64(pos[1]) / 100.0),
+				Z: int(float64(pos[2]) / 100.0),
 			}
 		}
 
@@ -609,6 +814,12 @@ func ExtractPowerConsumption(
 		// Skip non-consuming buildings (e.g. storage with mPowerInfo but no power use)
 		if actualMW == 0 && maxMW == 0 && status == "Unknown" {
 			continue
+		}
+
+		// Compute in-game productivity percentage from save file data
+		var productivity float64
+		if bf.HasLastProductivity && bf.LastProductivityDuration > 0 {
+			productivity = float64(bf.LastProductivityProduceDuration) / float64(bf.LastProductivityDuration) * 100
 		}
 
 		data.Consumers = append(data.Consumers, PowerConsumerEntry{
@@ -622,6 +833,7 @@ func ExtractPowerConsumption(
 			IsBlocked:    isBlocked,
 			Location:     loc,
 			ProducedItem: producedItem,
+			Productivity: productivity,
 		})
 	}
 
@@ -651,11 +863,6 @@ func extractProducedItem(bf *BuildingFacts, resourceNodeFacts map[string]*Resour
 
 var recipeNameRegex = regexp.MustCompile(`Recipe_(\w+)`)
 var descNameRegex = regexp.MustCompile(`Desc_(\w+)`)
-
-// formatLocationNum formats a float as a string with locale-style grouping.
-func formatLocationNum(v float64) string {
-	return strconv.FormatFloat(v, 'f', 0, 64)
-}
 
 func extractFuelFromInventoryRef(invPath string, inventoryStacks map[string][]InventoryStack) string {
 	stacks, ok := inventoryStacks[invPath]

@@ -1,10 +1,14 @@
 package parser
 
 import (
+	"bytes"
 	"compress/zlib"
 	"encoding/binary"
 	"fmt"
 	"io"
+	"runtime"
+	"sync"
+	"sync/atomic"
 )
 
 // Magic number every chunk header starts with.
@@ -18,18 +22,18 @@ const (
 
 // ChunkHeader is the metadata in front of each compressed chunk.
 type ChunkHeader struct {
-	PackageFileTag      uint32
-	ChunkHeaderVersion  uint32
-	MaxChunkSize        int32
+	PackageFileTag       uint32
+	ChunkHeaderVersion   uint32
+	MaxChunkSize         int32
 	CompressionAlgorithm uint8
-	CompressedSize      int32
-	UncompressedSize    int32
-	HeaderSize          int
+	CompressedSize       int32
+	UncompressedSize     int32
+	HeaderSize           int
 }
 
 // ChunkResult is a single decompressed chunk plus its sizes.
 type ChunkResult struct {
-	Index             int
+	Index            int
 	CompressedSize   int
 	UncompressedSize int
 	Data             []byte
@@ -117,98 +121,280 @@ func (d *Decompressor) readChunkHeader() (*ChunkHeader, error) {
 
 // DecompressAll inflates every chunk and glues the results together. On big
 // saves use StreamChunks() instead so you don't hold it all in memory at once.
+//
+// Workers inflate each chunk straight into its place in the result. Allocating a
+// buffer per chunk and copying it over left the garbage collector so much to
+// clean up that memory use reached about twice the size of the body.
 func (d *Decompressor) DecompressAll() ([]byte, error) {
-	var result []byte
-	chunks, err := d.StreamChunks()
+	total, err := d.TotalUncompressedSize()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("the file may be corrupt or truncated: %w", err)
 	}
-	for chunk := range chunks {
-		if chunk.Data == nil {
-			break // either an error or the end
+	result := make([]byte, total)
+
+	type job struct {
+		compressed []byte
+		dst        []byte
+	}
+	jobs := make(chan job, decompressWorkers)
+	var buffers sync.Pool
+	var failed atomic.Bool
+
+	var wg sync.WaitGroup
+	for i := 0; i < decompressWorkers; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			var in chunkInflater
+			defer in.close()
+			for j := range jobs {
+				if !failed.Load() && in.inflate(j.compressed, j.dst) != nil {
+					failed.Store(true)
+				}
+				buffers.Put(j.compressed[:0])
+			}
+		}()
+	}
+
+	var offset int64
+	var readErr error
+	for idx := 0; !failed.Load(); idx++ {
+		header, err := d.readChunkHeader()
+		if err == io.EOF && idx > 0 {
+			break
 		}
-		result = append(result, chunk.Data...)
+		if err != nil {
+			readErr = err
+			break
+		}
+		compressedSize, size := int(header.CompressedSize), int64(header.UncompressedSize)
+		if compressedSize < 0 || size < 0 || offset+size > total {
+			readErr = fmt.Errorf("chunk %d has invalid sizes", idx)
+			break
+		}
+
+		buf, _ := buffers.Get().([]byte)
+		if cap(buf) < compressedSize {
+			buf = make([]byte, compressedSize)
+		}
+		buf = buf[:compressedSize]
+		if _, err := io.ReadFull(d.reader, buf); err != nil {
+			readErr = err
+			break
+		}
+		d.pos += int64(compressedSize)
+
+		jobs <- job{compressed: buf, dst: result[offset : offset+size]}
+		offset += size
 	}
-	return result, nil
+	close(jobs)
+	wg.Wait()
+
+	if readErr != nil {
+		return nil, fmt.Errorf("the save data could not be read - the file may be corrupt or truncated: %w", readErr)
+	}
+	if failed.Load() {
+		return nil, fmt.Errorf("the save data could not be decompressed - the file may be corrupt or truncated")
+	}
+	return result[:offset], nil
 }
 
-// StreamChunks hands back a channel that yields decompressed chunks one by one.
-// Each one is inflated on demand and can be thrown away once you're done with
-// it. The channel closes when we run out of chunks or hit an error.
-func (d *Decompressor) StreamChunks() (<-chan ChunkResult, error) {
-	ch := make(chan ChunkResult, 1)
+// chunkInflater inflates chunks one at a time, keeping its zlib reader and input
+// reader between chunks instead of allocating a fresh inflate window (~32 KB) and
+// buffer each time.
+type chunkInflater struct {
+	src bytes.Reader
+	zr  io.ReadCloser
+}
 
+func (in *chunkInflater) inflate(compressed, dst []byte) error {
+	in.src.Reset(compressed)
+	var err error
+	if in.zr == nil {
+		in.zr, err = zlib.NewReader(&in.src)
+	} else {
+		err = in.zr.(zlib.Resetter).Reset(&in.src, nil)
+	}
+	if err != nil {
+		return err
+	}
+	if _, err := io.ReadFull(in.zr, dst); err != nil {
+		return err
+	}
+	// zlib only verifies its checksum at end of stream, which ReadFull stops just
+	// short of. Read on to the end so damage gets noticed.
+	var extra [1]byte
+	if _, err := in.zr.Read(extra[:]); err != io.EOF {
+		return fmt.Errorf("chunk is longer than its header says, or its checksum is wrong: %v", err)
+	}
+	return nil
+}
+
+func (in *chunkInflater) close() {
+	if in.zr != nil {
+		in.zr.Close()
+	}
+}
+
+// TotalUncompressedSize walks the chunk headers - skipping over each chunk's
+// compressed data via Seek, without decompressing anything - to sum the
+// total uncompressed size, then rewinds back to where the reader started.
+// This lets DecompressAll allocate its result once, and is cheap enough to
+// estimate memory needs before loading a save.
+func (d *Decompressor) TotalUncompressedSize() (int64, error) {
+	startPos := d.pos
+	var total int64
+	for {
+		header, err := d.readChunkHeader()
+		if err != nil {
+			break // EOF here just means we're done counting
+		}
+		total += int64(header.UncompressedSize)
+		if _, err := d.reader.Seek(int64(header.CompressedSize), io.SeekCurrent); err != nil {
+			return 0, err
+		}
+		d.pos += int64(header.CompressedSize)
+	}
+	if _, err := d.reader.Seek(startPos, io.SeekStart); err != nil {
+		return 0, err
+	}
+	d.pos = startPos
+	return total, nil
+}
+
+// decompressWorkers is how many chunks we inflate concurrently. Each chunk is
+// an independent zlib stream, so this is embarrassingly parallel. It's capped
+// because inflating faster than the consumer parses only burns memory.
+var decompressWorkers = func() int {
+	n := runtime.NumCPU()
+	if n > 8 {
+		n = 8
+	}
+	if n < 1 {
+		n = 1
+	}
+	return n
+}()
+
+// inflateJob is one chunk handed to a worker.
+type inflateJob struct {
+	index            int
+	compressed       []byte
+	uncompressedSize int
+	out              chan ChunkResult
+}
+
+// StreamChunks hands back a channel that yields decompressed chunks in order.
+// Reading the compressed bytes off the file stays sequential (it has to be,
+// each chunk header tells us where the next one starts), but the actual
+// inflating is spread over a pool of workers, since every chunk is a separate
+// zlib stream. Results are re-ordered before they reach the caller, so the
+// consumer still sees a plain sequential byte stream.
+//
+// The channel closes when we run out of chunks or hit an error; an error is
+// signalled by a ChunkResult with a nil Data, same as before.
+func (d *Decompressor) StreamChunks() (<-chan ChunkResult, error) {
 	// Read the first header up front so we can fail fast on a bad stream.
 	header, err := d.readChunkHeader()
 	if err != nil {
 		return nil, err
 	}
 
-	go func() {
-		defer close(ch)
-		idx := 0
+	ch := make(chan ChunkResult, decompressWorkers)
+	jobs := make(chan inflateJob, decompressWorkers)
+	// ordered carries one result channel per chunk, in stream order, so the
+	// emitter can hand chunks to the caller in the order they appear in the
+	// file no matter which worker finishes first. Its capacity bounds how far
+	// the reader may run ahead of the consumer.
+	ordered := make(chan chan ChunkResult, decompressWorkers*4)
 
+	// Reader: sequentially pull each chunk's compressed bytes off the stream
+	// and queue it for inflating.
+	go func() {
+		defer close(jobs)
+		defer close(ordered)
+		idx := 0
 		for {
-			// Pull in the compressed bytes for this chunk.
 			compressedSize := int(header.CompressedSize)
 			compressedData := make([]byte, compressedSize)
 			if _, err := io.ReadFull(d.reader, compressedData); err != nil {
-				ch <- ChunkResult{Index: idx, Data: nil}
+				failed := make(chan ChunkResult, 1)
+				failed <- ChunkResult{Index: idx, Data: nil}
+				ordered <- failed
 				return
 			}
 			d.pos += int64(compressedSize)
 
-			// Inflate it.
-			zr, err := zlib.NewReader(newBytesReader(compressedData))
-			if err != nil {
-				ch <- ChunkResult{Index: idx, Data: nil}
-				return
-			}
-
-			uncompressedSize := int(header.UncompressedSize)
-			decompressed := make([]byte, uncompressedSize)
-			if _, err := io.ReadFull(zr, decompressed); err != nil {
-				zr.Close()
-				ch <- ChunkResult{Index: idx, Data: nil}
-				return
-			}
-			zr.Close()
-
-			ch <- ChunkResult{
-				Index:             idx,
-				CompressedSize:   compressedSize,
-				UncompressedSize: uncompressedSize,
-				Data:             decompressed,
+			out := make(chan ChunkResult, 1)
+			ordered <- out
+			jobs <- inflateJob{
+				index:            idx,
+				compressed:       compressedData,
+				uncompressedSize: int(header.UncompressedSize),
+				out:              out,
 			}
 			idx++
 
 			// On to the next header.
 			header, err = d.readChunkHeader()
 			if err != nil {
-				// EOF just means we're finished.
+				// A clean EOF means we're finished; anything else (a bad tag, a
+				// header cut short) is a damaged file, not the end of the data.
+				if err != io.EOF {
+					failed := make(chan ChunkResult, 1)
+					failed <- ChunkResult{Index: idx, Data: nil}
+					ordered <- failed
+				}
 				return
 			}
 		}
 	}()
 
-	return ch, nil
-}
+	// Workers: inflate chunks in parallel. Each keeps one zlib reader alive and
+	// resets it per chunk instead of allocating a fresh inflate window (~32 KB)
+	// every time.
+	var wg sync.WaitGroup
+	for i := 0; i < decompressWorkers; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			var in chunkInflater
+			defer in.close()
+			for job := range jobs {
+				decompressed := make([]byte, job.uncompressedSize)
+				if err := in.inflate(job.compressed, decompressed); err != nil {
+					job.out <- ChunkResult{Index: job.index, Data: nil}
+					continue
+				}
 
-// bytesReader adapts a []byte to io.Reader.
-type bytesReader struct {
-	data []byte
-	pos  int
-}
-
-func newBytesReader(data []byte) io.Reader {
-	return &bytesReader{data: data}
-}
-
-func (b *bytesReader) Read(p []byte) (int, error) {
-	if b.pos >= len(b.data) {
-		return 0, io.EOF
+				job.out <- ChunkResult{
+					Index:            job.index,
+					CompressedSize:   len(job.compressed),
+					UncompressedSize: job.uncompressedSize,
+					Data:             decompressed,
+				}
+			}
+		}()
 	}
-	n := copy(p, b.data[b.pos:])
-	b.pos += n
-	return n, nil
+
+	// Emitter: drain the ordered queue so the caller sees chunks in stream order.
+	go func() {
+		defer close(ch)
+		for out := range ordered {
+			result := <-out
+			ch <- result
+			if result.Data == nil {
+				// Failure: drain the rest so the reader and workers can exit.
+				go func() {
+					for range ordered {
+					}
+				}()
+				wg.Wait()
+				return
+			}
+		}
+		wg.Wait()
+	}()
+
+	return ch, nil
 }

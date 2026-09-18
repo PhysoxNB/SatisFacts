@@ -11,74 +11,76 @@ import (
 
 // AnalyticsData holds all calculated analytics metrics.
 type AnalyticsData struct {
-	Power               map[string]interface{}            `json:"power"`
-	Production          map[string]interface{}            `json:"production"`
-	Manufacturing       map[string]interface{}            `json:"manufacturing"`
-	Efficiency          map[string]interface{}            `json:"efficiency"`
-	Storage             map[string]interface{}            `json:"storage"`
-	Transport           map[string]interface{}            `json:"transport"`
-	Map                 map[string]interface{}            `json:"map"`
-	Collectibles        map[string]interface{}            `json:"collectibles"`
-	ClockSpeedDistribution map[string]map[string]int      `json:"clockSpeedDistribution"`
-	ProductionBoostDistribution map[string]map[string]int  `json:"productionBoostDistribution"`
-	ClockSpeedSloopCounts map[string]map[string]int       `json:"clockSpeedSloopCounts"`
-	Inventory           map[string]interface{}            `json:"inventory"`
-	Trains              map[string]interface{}            `json:"trains"`
-	Drones              map[string]interface{}            `json:"drones"`
-	Vehicles            map[string]interface{}            `json:"vehicles"`
-	GameProgression     map[string]interface{}            `json:"gameProgression"`
-	Players             []PlayerInfo                      `json:"players"`
-	NuclearWaste        map[string]interface{}            `json:"nuclearWaste"`
+	Power                       map[string]interface{}    `json:"power"`
+	Production                  map[string]interface{}    `json:"production"`
+	Manufacturing               map[string]interface{}    `json:"manufacturing"`
+	Efficiency                  map[string]interface{}    `json:"efficiency"`
+	Storage                     map[string]interface{}    `json:"storage"`
+	Transport                   map[string]interface{}    `json:"transport"`
+	Collectibles                map[string]interface{}    `json:"collectibles"`
+	ClockSpeedDistribution      map[string]map[string]int `json:"clockSpeedDistribution"`
+	ProductionBoostDistribution map[string]map[string]int `json:"productionBoostDistribution"`
+	ClockSpeedSloopCounts       map[string]map[string]int `json:"clockSpeedSloopCounts"`
+	Inventory                   map[string]interface{}    `json:"inventory"`
+	Trains                      map[string]interface{}    `json:"trains"`
+	Drones                      map[string]interface{}    `json:"drones"`
+	Vehicles                    map[string]interface{}    `json:"vehicles"`
+	GameProgression             map[string]interface{}    `json:"gameProgression"`
+	Players                     []PlayerInfo              `json:"players"`
+	NuclearWaste                map[string]interface{}    `json:"nuclearWaste"`
 }
 
 // AnalyticsInput holds all data needed for analytics calculation.
 type AnalyticsInput struct {
-	Buildings          map[string]int
-	ClockSpeeds        map[string]float32
-	ProductionBoosts   map[string]float32
-	BuildingTypes      map[string]string
-	BuildingRecipes    map[string]string
-	BuildingInventories map[string]BuildingInventoryRefs
-	BuildingConnections map[string]BuildingConnection
-	InventoryContents  map[string]int
-	PowerConsumption   PowerConsumptionData
-	GeneratorPower     GeneratorPowerData
-	NuclearWaste       NuclearWasteData
-	APABuildingCount   int
-	APAFueledCount     int
-	MinerPurities      map[string]string
-	MinerResources     map[string]string
-	GeothermalPurities map[string]string
-	FrackingFluidTypes map[string]string
-	FrackingPurities   map[string]string
-	Collectibles       CollectiblesData
-	CollectiblesFound  CollectiblesFoundData
+	Buildings             map[string]int
+	ClockSpeeds           map[string]float32
+	ProductionBoosts      map[string]float32
+	BuildingTypes         map[string]string
+	BuildingRecipes       map[string]string
+	BuildingInventories   map[string]BuildingInventoryRefs
+	BuildingConnections   map[string]BuildingConnection
+	InventoryContents     map[string]int
+	PowerConsumption      PowerConsumptionData
+	GeneratorPower        GeneratorPowerData
+	NuclearWaste          NuclearWasteData
+	APABuildingCount      int
+	APAFueledCount        int
+	MinerPurities         map[string]string
+	MinerResources        map[string]string
+	GeothermalPurities    map[string]string
+	FrackingFluidTypes    map[string]string
+	FrackingPurities      map[string]string
+	Collectibles          CollectiblesData
+	CollectiblesFound     CollectiblesFoundData
 	CollectedCollectibles CollectedCollectiblesData
-	Pickups            []PickupItem
-	GameProgression    GameProgressionData
-	Players            []PlayerInfo
-	SaveVersion        int
+	CollectibleLocations  map[string][3]float32
+	Pickups               []PickupItem
+	GameProgression       GameProgressionData
+	Players               []PlayerInfo
+	SaveVersion           int
 	// Transport data
-	Belts              map[string]*BeltTypeStats
-	BeltHeads          map[string]int
-	Lifts              map[string]*BeltTypeStats
-	Pipes              map[string]*PipeTypeStats
-	PowerLines         []float64
-	Hypertubes         []float64
-	Elevators          []float64
-	VehiclePaths       []float64
-	Rails              RailStats
-	Trains             TrainStats
-	Drones             DroneStats
-	Vehicles           VehicleStats
+	Belts        map[string]*BeltTypeStats
+	BeltHeads    map[string]int
+	Lifts        map[string]*BeltTypeStats
+	Pipes        map[string]*PipeTypeStats
+	PowerLines   []float64
+	Hypertubes   []float64
+	Elevators    []float64
+	VehiclePaths []float64
+	Rails        RailStats
+	Trains       TrainStats
+	Drones       DroneStats
+	Vehicles     VehicleStats
 	// Structures
-	Structures         *StructureData
+	Structures *StructureData
 	// Resolved inventories
 	ResolvedInventories map[string]ResolvedInventory
 	// Retained objects for position-based calculations
-	RetainedObjects     []*parser.SaveObject
+	RetainedObjects []*parser.SaveObject
 	// BuildingFacts for position-based calculations
-	BuildingFacts       map[string]*BuildingFacts
+	BuildingFacts map[string]*BuildingFacts
+	// Per-container storage details
+	StorageContainerDetails []StorageContainerDetail
 }
 
 // CalculateAnalytics computes all analytics from the extracted data.
@@ -87,24 +89,23 @@ func CalculateAnalytics(input AnalyticsInput) *AnalyticsData {
 	production := calculateProductionAnalytics(input)
 
 	return &AnalyticsData{
-		Power:               calculatePowerAnalytics(input),
-		Production:          production,
-		Manufacturing:       manufacturing,
-		Efficiency:          calculateEfficiencyAnalytics(input, manufacturing, production),
-		Storage:             calculateStorageAnalytics(input),
-		Transport:           calculateTransportAnalytics(input),
-		Map:                 calculateMapAnalytics(input),
-		Collectibles:        calculateCollectiblesAnalytics(input),
-		ClockSpeedDistribution: calculateClockSpeedDistribution(input),
-	ProductionBoostDistribution: calculateProductionBoostDistribution(input),
-	ClockSpeedSloopCounts: calculateClockSpeedSloopCounts(input),
-		Inventory:           calculateInventoryAnalytics(input),
-		Trains:              calculateTrainAnalytics(input),
-		Drones:              calculateDroneAnalytics(input),
-		Vehicles:            calculateVehicleAnalytics(input),
-		GameProgression:     calculateGameProgressionAnalytics(input),
-		Players:             input.Players,
-		NuclearWaste:        calculateNuclearWasteAnalytics(input),
+		Power:                       calculatePowerAnalytics(input),
+		Production:                  production,
+		Manufacturing:               manufacturing,
+		Efficiency:                  calculateEfficiencyAnalytics(input, manufacturing, production),
+		Storage:                     calculateStorageAnalytics(input),
+		Transport:                   calculateTransportAnalytics(input),
+		Collectibles:                calculateCollectiblesAnalytics(input),
+		ClockSpeedDistribution:      calculateClockSpeedDistribution(input),
+		ProductionBoostDistribution: calculateProductionBoostDistribution(input),
+		ClockSpeedSloopCounts:       calculateClockSpeedSloopCounts(input),
+		Inventory:                   calculateInventoryAnalytics(input),
+		Trains:                      calculateTrainAnalytics(input),
+		Drones:                      calculateDroneAnalytics(input),
+		Vehicles:                    calculateVehicleAnalytics(input),
+		GameProgression:             calculateGameProgressionAnalytics(input),
+		Players:                     input.Players,
+		NuclearWaste:                calculateNuclearWasteAnalytics(input),
 	}
 }
 
@@ -209,10 +210,10 @@ func calculateCollectiblesAnalytics(input AnalyticsInput) map[string]interface{}
 		}
 		availablePickups++
 		totalPickupItems += p.NumItems
-		pos := map[string]string{
-			"X": formatLocationNum(float64(p.Position[0]) / 100.0),
-			"Y": formatLocationNum(float64(p.Position[1]) / 100.0),
-			"Z": formatLocationNum(float64(p.Position[2]) / 100.0),
+		pos := map[string]int{
+			"X": int(float64(p.Position[0]) / 100.0),
+			"Y": int(float64(p.Position[1]) / 100.0),
+			"Z": int(float64(p.Position[2]) / 100.0),
 		}
 		if existing, ok := pickupByType[p.ItemName]; ok {
 			entry := existing.(map[string]interface{})
@@ -245,54 +246,63 @@ func calculateCollectiblesAnalytics(input AnalyticsInput) map[string]interface{}
 		},
 		"total_pickups": input.Collectibles.TotalPickups,
 		"item_pickups": map[string]interface{}{
-			"available_count":    availablePickups,
-			"total_items":        totalPickupItems,
-			"by_type":            pickupByType,
+			"available_count": availablePickups,
+			"total_items":     totalPickupItems,
+			"by_type":         pickupByType,
 		},
-		"world_collectibles": calculateWorldCollectibles(input.CollectiblesFound, input.CollectedCollectibles),
+		"world_collectibles": calculateWorldCollectibles(input.CollectiblesFound, input.CollectedCollectibles, input.CollectibleLocations),
 	}
 }
 
 // calculateWorldCollectibles computes collected vs remaining for slugs, somersloops,
 // mercer spheres, and crash sites using the collectables1 list from the TOC blob
 // for accurate collected counts, and the world data reference for totals.
-func calculateWorldCollectibles(found CollectiblesFoundData, collected CollectedCollectiblesData) map[string]interface{} {
-	if collectiblesWorldLoaded == nil {
+func calculateWorldCollectibles(found CollectiblesFoundData, collected CollectedCollectiblesData, locations map[string][3]float32) map[string]interface{} {
+	if collectiblePositionsLoaded == nil {
 		return nil
 	}
 
 	// Power slugs: collected from collectables1, remaining = total - collected
-	blueTotal := len(collectiblesWorldLoaded.PowerSlugs.Blue)
+	blueTotal := len(collectiblePositionsLoaded.PowerSlugs.Blue)
 	blueCollected := len(collected.PowerSlugsBlue)
-	yellowTotal := len(collectiblesWorldLoaded.PowerSlugs.Yellow)
+	yellowTotal := len(collectiblePositionsLoaded.PowerSlugs.Yellow)
 	yellowCollected := len(collected.PowerSlugsYellow)
-	purpleTotal := len(collectiblesWorldLoaded.PowerSlugs.Purple)
+	purpleTotal := len(collectiblePositionsLoaded.PowerSlugs.Purple)
 	purpleCollected := len(collected.PowerSlugsPurple)
 	slugTotal := blueTotal + yellowTotal + purpleTotal
 	slugCollected := blueCollected + yellowCollected + purpleCollected
 
 	// Somersloops
-	sloopTotal := len(collectiblesWorldLoaded.Somersloops)
+	sloopTotal := len(collectiblePositionsLoaded.Somersloops)
 	sloopCollected := len(collected.Somersloops)
 
 	// Mercer spheres
-	sphereTotal := len(collectiblesWorldLoaded.MercerSpheres)
+	sphereTotal := len(collectiblePositionsLoaded.MercerSpheres)
 	sphereCollected := len(collected.MercerSpheres)
 
 	// Crash sites: collectables1 tracks dismantled crash sites.
 	// Crash sites still in the save can be opened or unopened.
-	crashTotal := len(collectiblesWorldLoaded.CrashSites)
+	crashTotal := len(collectiblePositionsLoaded.CrashSites)
 	crashDismantled := len(collected.CrashSites)
 	crashOpened := len(found.CrashSiteOpened)
 	crashUnopened := len(found.CrashSiteUnopened)
 	// "collected" = dismantled + opened (hard drive grabbed in both cases)
 	crashCollected := crashDismantled + crashOpened
 
+	// Build location lists for remaining (uncollected) collectibles.
+	// Uses save positions first, then static reference positions as fallback
+	// for collectibles in unexplored areas.
+	slugLocations := buildSlugLocations(collected, locations)
+	sloopLocations := buildSimpleLocations(collectiblePositionsLoaded.Somersloops, collected.Somersloops, locations, collectiblePositionsLoaded.Somersloops)
+	sphereLocations := buildSimpleLocations(collectiblePositionsLoaded.MercerSpheres, collected.MercerSpheres, locations, collectiblePositionsLoaded.MercerSpheres)
+	crashLocations := buildCrashLocations(found, collected, locations)
+
 	return map[string]interface{}{
 		"power_slugs": map[string]interface{}{
 			"total":     slugTotal,
 			"collected": slugCollected,
 			"remaining": slugTotal - slugCollected,
+			"locations": slugLocations,
 			"blue": map[string]interface{}{
 				"total":     blueTotal,
 				"collected": blueCollected,
@@ -313,11 +323,13 @@ func calculateWorldCollectibles(found CollectiblesFoundData, collected Collected
 			"total":     sloopTotal,
 			"collected": sloopCollected,
 			"remaining": sloopTotal - sloopCollected,
+			"locations": sloopLocations,
 		},
 		"mercer_spheres": map[string]interface{}{
 			"total":     sphereTotal,
 			"collected": sphereCollected,
 			"remaining": sphereTotal - sphereCollected,
+			"locations": sphereLocations,
 		},
 		"crash_sites": map[string]interface{}{
 			"total":      crashTotal,
@@ -326,12 +338,180 @@ func calculateWorldCollectibles(found CollectiblesFoundData, collected Collected
 			"dismantled": crashDismantled,
 			"collected":  crashCollected,
 			"remaining":  crashTotal - crashCollected,
+			"locations":  crashLocations,
 		},
 	}
 }
 
+// buildSlugLocations builds a sorted list of remaining slug locations.
+// Iterates all world slugs not in collected, using save positions first
+// and static reference positions as fallback for unexplored areas.
+func buildSlugLocations(collected CollectedCollectiblesData, locations map[string][3]float32) []map[string]interface{} {
+	type entry struct {
+		color   string
+		x, y, z int
+	}
+	var entries []entry
+
+	processSlug := func(ref, color string, collectedMap map[string]bool, staticMap map[string]Position) {
+		if _, ok := collectedMap[ref]; ok {
+			return
+		}
+		var x, y, z int
+		if loc, ok := locations[ref]; ok {
+			x = int(math.Round(float64(loc[0]) / 100))
+			y = int(math.Round(float64(loc[1]) / 100))
+			z = int(math.Round(float64(loc[2]) / 100))
+		} else if pos, ok := staticMap[ref]; ok {
+			x, y, z = pos.X, pos.Y, pos.Z
+		} else {
+			return
+		}
+		entries = append(entries, entry{color, x, y, z})
+	}
+
+	blueStatic := collectiblePositionsLoaded.PowerSlugs.Blue
+	yellowStatic := collectiblePositionsLoaded.PowerSlugs.Yellow
+	purpleStatic := collectiblePositionsLoaded.PowerSlugs.Purple
+	for ref := range collectiblePositionsLoaded.PowerSlugs.Blue {
+		processSlug(ref, "Blue", collected.PowerSlugsBlue, blueStatic)
+	}
+	for ref := range collectiblePositionsLoaded.PowerSlugs.Yellow {
+		processSlug(ref, "Yellow", collected.PowerSlugsYellow, yellowStatic)
+	}
+	for ref := range collectiblePositionsLoaded.PowerSlugs.Purple {
+		processSlug(ref, "Purple", collected.PowerSlugsPurple, purpleStatic)
+	}
+
+	// Entries are gathered from maps, so they arrive in random order. Sorting on
+	// colour alone leaves same-coloured slugs shuffled differently on every run,
+	// which reorders the paginated table in the report for an unchanged save.
+	// Coordinates break every remaining tie.
+	sort.Slice(entries, func(i, j int) bool {
+		if entries[i].color != entries[j].color {
+			return entries[i].color < entries[j].color
+		}
+		if entries[i].x != entries[j].x {
+			return entries[i].x < entries[j].x
+		}
+		if entries[i].y != entries[j].y {
+			return entries[i].y < entries[j].y
+		}
+		return entries[i].z < entries[j].z
+	})
+	result := make([]map[string]interface{}, 0, len(entries))
+	for _, e := range entries {
+		result = append(result, map[string]interface{}{
+			"color":    e.color,
+			"location": map[string]int{"X": e.x, "Y": e.y, "Z": e.z},
+		})
+	}
+	return result
+}
+
+// buildSimpleLocations builds a sorted list of locations for somersloops or mercer spheres.
+// Iterates all world collectibles not in collected, using save positions first
+// and static reference positions as fallback for unexplored areas.
+func buildSimpleLocations(worldRefs map[string]Position, collectedRefs map[string]bool, locations map[string][3]float32, staticMap map[string]Position) []map[string]interface{} {
+	type entry struct {
+		x, y, z int
+	}
+	var entries []entry
+	for ref := range worldRefs {
+		if _, ok := collectedRefs[ref]; ok {
+			continue
+		}
+		var x, y, z int
+		if loc, ok := locations[ref]; ok {
+			x = int(math.Round(float64(loc[0]) / 100))
+			y = int(math.Round(float64(loc[1]) / 100))
+			z = int(math.Round(float64(loc[2]) / 100))
+		} else if pos, ok := staticMap[ref]; ok {
+			x, y, z = pos.X, pos.Y, pos.Z
+		} else {
+			continue
+		}
+		entries = append(entries, entry{x, y, z})
+	}
+	// Sorted on all three axes so the order is stable across runs (see
+	// buildSlugLocations).
+	sort.Slice(entries, func(i, j int) bool {
+		if entries[i].x != entries[j].x {
+			return entries[i].x < entries[j].x
+		}
+		if entries[i].y != entries[j].y {
+			return entries[i].y < entries[j].y
+		}
+		return entries[i].z < entries[j].z
+	})
+	result := make([]map[string]interface{}, 0, len(entries))
+	for _, e := range entries {
+		result = append(result, map[string]interface{}{
+			"location": map[string]int{"X": e.x, "Y": e.y, "Z": e.z},
+		})
+	}
+	return result
+}
+
+// buildCrashLocations builds a sorted list of remaining crash site locations.
+// Includes both unopened and opened (looted but not dismantled) crash sites.
+// Iterates all world crash sites not in collected (dismantled), using save
+// positions first and static reference positions as fallback for unexplored areas.
+func buildCrashLocations(found CollectiblesFoundData, collected CollectedCollectiblesData, locations map[string][3]float32) []map[string]interface{} {
+	type entry struct {
+		status  string
+		x, y, z int
+	}
+	var entries []entry
+	crashStatic := collectiblePositionsLoaded.CrashSites
+	for ref := range collectiblePositionsLoaded.CrashSites {
+		if _, ok := collected.CrashSites[ref]; ok {
+			continue // dismantled
+		}
+		var status string
+		if _, ok := found.CrashSiteOpened[ref]; ok {
+			status = "Looted"
+		} else {
+			status = "Unopened" // includes unexplored (not in save)
+		}
+		var x, y, z int
+		if loc, ok := locations[ref]; ok {
+			x = int(math.Round(float64(loc[0]) / 100))
+			y = int(math.Round(float64(loc[1]) / 100))
+			z = int(math.Round(float64(loc[2]) / 100))
+		} else if pos, ok := crashStatic[ref]; ok {
+			x, y, z = pos.X, pos.Y, pos.Z
+		} else {
+			continue
+		}
+		entries = append(entries, entry{status, x, y, z})
+	}
+	// Sorted on all three axes so the order is stable across runs (see
+	// buildSlugLocations).
+	sort.Slice(entries, func(i, j int) bool {
+		if entries[i].status != entries[j].status {
+			return entries[i].status < entries[j].status
+		}
+		if entries[i].x != entries[j].x {
+			return entries[i].x < entries[j].x
+		}
+		if entries[i].y != entries[j].y {
+			return entries[i].y < entries[j].y
+		}
+		return entries[i].z < entries[j].z
+	})
+	result := make([]map[string]interface{}, 0, len(entries))
+	for _, e := range entries {
+		result = append(result, map[string]interface{}{
+			"status":   e.status,
+			"location": map[string]int{"X": e.x, "Y": e.y, "Z": e.z},
+		})
+	}
+	return result
+}
+
 func calculateInventoryAnalytics(input AnalyticsInput) map[string]interface{} {
-	if input.InventoryContents == nil || len(input.InventoryContents) == 0 {
+	if len(input.InventoryContents) == 0 {
 		return nil
 	}
 
@@ -340,115 +520,17 @@ func calculateInventoryAnalytics(input AnalyticsInput) map[string]interface{} {
 		totalItems += count
 	}
 
-	// Sort items by count (descending)
-	type kv struct {
-		key   string
-		value int
-	}
-	var sorted []kv
+	// items_by_count is a plain map: JSON emits it alphabetically and the storage
+	// tab sorts it by count client-side, so sorting it here would achieve nothing.
+	itemsByCount := make(map[string]int, len(input.InventoryContents))
 	for k, v := range input.InventoryContents {
-		sorted = append(sorted, kv{k, v})
-	}
-	sort.Slice(sorted, func(i, j int) bool { return sorted[i].value > sorted[j].value })
-
-	itemsByCount := make(map[string]int)
-	for _, item := range sorted {
-		itemsByCount[item.key] = item.value
-	}
-
-	// Categorize items
-	categories := map[string]map[string]int{
-		"ores":       {},
-		"ingots":     {},
-		"components": {},
-		"equipment":  {},
-		"other":      {},
-	}
-	for name, count := range input.InventoryContents {
-		lower := strings.ToLower(name)
-		if strings.Contains(lower, "ore") || strings.Contains(lower, "raw") {
-			categories["ores"][name] = count
-		} else if strings.Contains(lower, "ingot") || strings.Contains(lower, "plate") {
-			categories["ingots"][name] = count
-		} else if strings.Contains(lower, "screw") || strings.Contains(lower, "rod") ||
-			strings.Contains(lower, "beam") || strings.Contains(lower, "encased") {
-			categories["components"][name] = count
-		} else if strings.Contains(lower, "gun") || strings.Contains(lower, "xeno") ||
-			strings.Contains(lower, "rebar") {
-			categories["equipment"][name] = count
-		} else {
-			categories["other"][name] = count
-		}
+		itemsByCount[k] = v
 	}
 
 	return map[string]interface{}{
 		"total_items":       totalItems,
 		"items_by_count":    itemsByCount,
-		"categories":        categories,
 		"unique_item_types": len(input.InventoryContents),
-	}
-}
-
-func calculateMapAnalytics(input AnalyticsInput) map[string]interface{} {
-	if mapDataLoaded == nil {
-		return nil
-	}
-
-	foundationCount := 0
-	if input.Structures != nil && input.Structures.Details != nil {
-		if foundations, ok := input.Structures.Details["foundations"]; ok {
-			for _, count := range foundations {
-				foundationCount += count
-			}
-		}
-	}
-
-	totalBuildings := 0
-	for _, count := range input.Buildings {
-		totalBuildings += count
-	}
-
-	// Calculate bounding box from all BuildingFacts with positions
-	minX, maxX := math.MaxFloat32, -math.MaxFloat32
-	minY, maxY := math.MaxFloat32, -math.MaxFloat32
-	positionCount := 0
-	for _, bf := range input.BuildingFacts {
-		if bf == nil || !bf.HasTransform {
-			continue
-		}
-		x, y := float64(bf.Translation[0]), float64(bf.Translation[1])
-		if x < minX { minX = x }
-		if x > maxX { maxX = x }
-		if y < minY { minY = y }
-		if y > maxY { maxY = y }
-		positionCount++
-	}
-
-	// Convert cm to m, calculate area from bounding box
-	totalAreaM2 := 0.0
-	totalAreaKm2 := 0.0
-	buildingDensity := 0.0
-	if positionCount > 0 && maxX > minX && maxY > minY {
-		widthM := (maxX - minX) / 100.0
-		lengthM := (maxY - minY) / 100.0
-		totalAreaM2 = widthM * lengthM
-		totalAreaKm2 = totalAreaM2 / 1000000.0
-		if totalAreaKm2 > 0 {
-			buildingDensity = float64(totalBuildings) / totalAreaKm2
-		}
-	}
-
-	return map[string]interface{}{
-		"foundation_count": foundationCount,
-		"total_area_m2":    totalAreaM2,
-		"total_area_km2":   totalAreaKm2,
-		"total_buildings":  totalBuildings,
-		"building_density": buildingDensity,
-		"foundation_size":  mapDataLoaded.Foundations,
-		"bounding_box": map[string]interface{}{
-			"width_m":  (maxX - minX) / 100.0,
-			"length_m": (maxY - minY) / 100.0,
-		},
 	}
 }
 
@@ -459,27 +541,26 @@ func calculateStorageAnalytics(input AnalyticsInput) map[string]interface{} {
 
 	var storageMk1, industrialContainers, dimensionalDepots, storageIntegrated, totalSlots int
 
+	// Multiple class names fall into the same bucket, so use += not =.
+	// Map iteration order is random – = would let the last type win and lose the rest.
 	for btype, count := range input.Buildings {
 		lower := strings.ToLower(btype)
 		if strings.Contains(lower, "storagecontainer") && !strings.Contains(lower, "industrial") {
 			if strings.Contains(lower, "mk1") || strings.Contains(lower, "mk_1") {
-				storageMk1 = count
+				storageMk1 += count
 				totalSlots += count * storageDataLoaded.Containers["StorageContainer"].Slots
-			} else if strings.Contains(lower, "mk2") || strings.Contains(lower, "mk_2") {
-				industrialContainers = count
-				totalSlots += count * storageDataLoaded.Containers["StorageContainer_Mk2"].Slots
 			} else {
-				industrialContainers = count
+				industrialContainers += count
 				totalSlots += count * storageDataLoaded.Containers["StorageContainer_Mk2"].Slots
 			}
 		} else if strings.Contains(lower, "industrialstorage") {
-			industrialContainers = count
+			industrialContainers += count
 			totalSlots += count * storageDataLoaded.Containers["IndustrialStorageContainer"].Slots
 		} else if strings.Contains(lower, "centralstorage") {
-			dimensionalDepots = count
+			dimensionalDepots += count
 			totalSlots += count * storageDataLoaded.Containers["CentralStorage"].Slots
 		} else if strings.Contains(lower, "storageintegrated") {
-			storageIntegrated = count
+			storageIntegrated += count
 			totalSlots += count * storageDataLoaded.Containers["StorageIntegrated"].Slots
 		}
 	}
@@ -491,28 +572,62 @@ func calculateStorageAnalytics(input AnalyticsInput) map[string]interface{} {
 			"dimensional_depot": map[string]interface{}{"count": dimensionalDepots, "slots": storageDataLoaded.Containers["CentralStorage"].Slots},
 			"integrated":        map[string]interface{}{"count": storageIntegrated, "slots": storageDataLoaded.Containers["StorageIntegrated"].Slots},
 		},
-		"total_slots": totalSlots,
+		"total_slots":       totalSlots,
+		"container_details": buildContainerDetailsJSON(input.StorageContainerDetails),
 	}
+}
+
+func buildContainerDetailsJSON(details []StorageContainerDetail) []map[string]interface{} {
+	if len(details) == 0 {
+		return nil
+	}
+	result := make([]map[string]interface{}, 0, len(details))
+	for _, d := range details {
+		entry := map[string]interface{}{
+			"type": d.Type,
+		}
+		if d.Location != nil {
+			entry["location"] = map[string]int{
+				"X": int(d.Location[0]),
+				"Y": int(d.Location[1]),
+				"Z": int(d.Location[2]),
+			}
+		}
+		if len(d.Items) > 0 {
+			items := make([]map[string]interface{}, 0, len(d.Items))
+			for _, it := range d.Items {
+				items = append(items, map[string]interface{}{
+					"item":  it.Item,
+					"count": it.Count,
+				})
+			}
+			entry["items"] = items
+		}
+		result = append(result, entry)
+	}
+	return result
 }
 
 func calculateTransportAnalytics(input AnalyticsInput) map[string]interface{} {
 
-	// Infrastructure lengths
+	// Infrastructure lengths. These come out of maps, and adding floats in a
+	// different order gives a slightly different answer, so the totals wobble
+	// in the last decimal place unless we fix the order.
 	beltLength := 0.0
-	for _, belt := range input.Belts {
-		beltLength += belt.TotalLength
+	for _, k := range sortedKeys(input.Belts) {
+		beltLength += input.Belts[k].TotalLength
 	}
 	beltLengthKm := beltLength / 1000
 
 	liftLength := 0.0
-	for _, lift := range input.Lifts {
-		liftLength += lift.TotalLength
+	for _, k := range sortedKeys(input.Lifts) {
+		liftLength += input.Lifts[k].TotalLength
 	}
 	liftLengthKm := liftLength / 1000
 
 	pipeLength := 0.0
-	for _, pipe := range input.Pipes {
-		pipeLength += pipe.TotalLength
+	for _, k := range sortedKeys(input.Pipes) {
+		pipeLength += input.Pipes[k].TotalLength
 	}
 	pipeLengthKm := pipeLength / 1000
 
@@ -541,10 +656,10 @@ func calculateTransportAnalytics(input AnalyticsInput) map[string]interface{} {
 	return map[string]interface{}{
 		"total_infrastructure_km": totalInfraKm,
 		"infrastructure_breakdown": map[string]interface{}{
-			"belts_km":       beltLengthKm,
-			"lifts_km":       liftLengthKm,
-			"pipes_km":       pipeLengthKm,
-			"power_lines_km": powerLineLengthKm,
+			"belts_km":         beltLengthKm,
+			"lifts_km":         liftLengthKm,
+			"pipes_km":         pipeLengthKm,
+			"power_lines_km":   powerLineLengthKm,
 			"hypertubes_km":    hypertubeLengthKm,
 			"trains_km":        trainLengthKm,
 			"vehicle_paths_km": vehiclePathLengthKm,
@@ -556,50 +671,64 @@ func calculateTrainAnalytics(input AnalyticsInput) map[string]interface{} {
 	loc := input.Trains.Locomotives
 	wagons := input.Trains.Wagons
 	stations := input.Trains.Stations
+	freightPlatforms := input.Trains.FreightPlatforms
+	fluidFreightPlatforms := input.Trains.FluidFreightPlatforms
 	railCount := input.Rails.Count
 
-	if loc == 0 && wagons == 0 && stations == 0 && railCount == 0 {
+	if loc == 0 && wagons == 0 && stations == 0 && freightPlatforms == 0 && fluidFreightPlatforms == 0 && railCount == 0 {
 		return nil
 	}
 
 	return map[string]interface{}{
-		"locomotives":     loc,
-		"wagons":          wagons,
-		"stations":        stations,
-		"total_vehicles":  loc + wagons,
-		"rail_count":      railCount,
-		"rail_length_km":  input.Rails.TotalLength / 1000,
+		"locomotives":           loc,
+		"wagons":                wagons,
+		"stations":              stations,
+		"freightPlatforms":      freightPlatforms,
+		"fluidFreightPlatforms": fluidFreightPlatforms,
+		"total_vehicles":        loc + wagons,
+		"rail_count":            railCount,
+		"rail_length_km":        input.Rails.TotalLength / 1000,
 	}
 }
 
 func calculateDroneAnalytics(input AnalyticsInput) map[string]interface{} {
 	stations := input.Drones.Stations
 	freight := input.Drones.FreightPlatforms
-	if stations == 0 && freight == 0 {
+	drones := input.Drones.Drones
+	if stations == 0 && freight == 0 && drones == 0 {
 		return nil
 	}
 	return map[string]interface{}{
 		"stations":             stations,
 		"freight_platforms":    freight,
+		"drones":               drones,
 		"total_infrastructure": stations + freight,
 	}
 }
 
 func calculateVehicleAnalytics(input AnalyticsInput) map[string]interface{} {
 	trucks := input.Vehicles.Trucks
+	fluidTrucks := input.Vehicles.FluidTrucks
 	explorers := input.Vehicles.Explorers
 	tractors := input.Vehicles.Tractors
-	cykles := input.Vehicles.Cykles
-	total := trucks + explorers + tractors + cykles
+	golfcarts := input.Vehicles.Golfcarts
+	cyberwagons := input.Vehicles.Cyberwagons
+	truckStations := input.Vehicles.TruckStations
+	fluidTruckStations := input.Vehicles.FluidTruckStations
+	total := trucks + fluidTrucks + explorers + tractors + golfcarts + cyberwagons + truckStations + fluidTruckStations
 	if total == 0 {
 		return nil
 	}
 	return map[string]interface{}{
-		"trucks":    trucks,
-		"explorers": explorers,
-		"tractors":  tractors,
-		"cykles":    cykles,
-		"total":     total,
+		"trucks":             trucks,
+		"fluidTrucks":        fluidTrucks,
+		"explorers":          explorers,
+		"tractors":           tractors,
+		"golfcarts":          golfcarts,
+		"cyberwagons":        cyberwagons,
+		"truckStations":      truckStations,
+		"fluidTruckStations": fluidTruckStations,
+		"total":              total,
 	}
 }
 
@@ -715,12 +844,22 @@ func calculateNuclearWasteAnalytics(input AnalyticsInput) map[string]interface{}
 		wasteProdRate := wasteRate * clockMult
 		totalWasteProduction += wasteProdRate
 
+		var locMap map[string]int
+		if plant.Location != nil {
+			locMap = map[string]int{
+				"X": int(plant.Location[0] / 100.0),
+				"Y": int(plant.Location[1] / 100.0),
+				"Z": int(plant.Location[2] / 100.0),
+			}
+		}
+
 		enrichedPlants[i] = map[string]interface{}{
-			"instance":             plant.Instance,
-			"clockSpeed":           plant.ClockSpeed,
-			"fuelType":             fuelType,
-			"powerOutput":          powerOutput,
-			"wasteProductionRate":  wasteProdRate,
+			"instance":            plant.Instance,
+			"clockSpeed":          plant.ClockSpeed,
+			"fuelType":            fuelType,
+			"powerOutput":         powerOutput,
+			"wasteProductionRate": wasteProdRate,
+			"location":            locMap,
 		}
 	}
 
@@ -734,13 +873,13 @@ func calculateNuclearWasteAnalytics(input AnalyticsInput) map[string]interface{}
 	}
 
 	return map[string]interface{}{
-		"plant_count":           plantCount,
-		"total_power_output":    totalPowerOutput,
+		"plant_count":            plantCount,
+		"total_power_output":     totalPowerOutput,
 		"total_waste_production": totalWasteProduction,
-		"average_clock_speed":   avgClockSpeed,
-		"fuel_type_counts":      fuelTypeCounts,
-		"total_stored_waste":    waste.TotalStoredWaste,
-		"waste_containers":      waste.WasteContainers,
-		"plants":                enrichedPlants,
+		"average_clock_speed":    avgClockSpeed,
+		"fuel_type_counts":       fuelTypeCounts,
+		"total_stored_waste":     waste.TotalStoredWaste,
+		"waste_containers":       waste.WasteContainers,
+		"plants":                 enrichedPlants,
 	}
 }

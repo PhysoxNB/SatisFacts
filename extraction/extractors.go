@@ -117,35 +117,392 @@ func CalculateSplineLength(splineProp parser.Property) float64 {
 	return splineLengthFromProperty(splineProp)
 }
 
-func splineLengthFromProperty(p parser.Property) float64 {
-	// mSplineData is an ArrayProperty with value: map[string]interface{}{"type":"StructProperty", "items": [...]}
-	var arr []interface{}
+// splineItems unwraps mSplineData into its list of points. The parser hands
+// this back in two different shapes depending on the property, so both are
+// handled here.
+func splineItems(p parser.Property) []interface{} {
 	if v, ok := p.Value.([]interface{}); ok {
-		arr = v
-	} else if m, ok := p.Value.(map[string]interface{}); ok {
+		return v
+	}
+	if m, ok := p.Value.(map[string]interface{}); ok {
 		if items, ok := m["items"].([]interface{}); ok {
-			arr = items
+			return items
 		}
 	}
+	return nil
+}
+
+// rotateByQuat rotates v by the quaternion q (x, y, z, w) using
+// v' = v + 2 * cross(q.xyz, cross(q.xyz, v) + q.w*v).
+func rotateByQuat(v [3]float64, q [4]float32) [3]float64 {
+	qx, qy, qz, qw := float64(q[0]), float64(q[1]), float64(q[2]), float64(q[3])
+
+	// t = cross(q.xyz, v) + q.w * v
+	tx := qy*v[2] - qz*v[1] + qw*v[0]
+	ty := qz*v[0] - qx*v[2] + qw*v[1]
+	tz := qx*v[1] - qy*v[0] + qw*v[2]
+
+	// v' = v + 2 * cross(q.xyz, t)
+	return [3]float64{
+		v[0] + 2*(qy*tz-qz*ty),
+		v[1] + 2*(qz*tx-qx*tz),
+		v[2] + 2*(qx*ty-qy*tx),
+	}
+}
+
+// SplineEndpointsWorld returns the world positions, in meters, of the first and
+// last point of a spline.
+//
+// Spline points are stored in the actor's local space, so they have to be
+// rotated by the actor's rotation and offset by its translation before they
+// mean anything on the map. Without that, both ends of a track piece look like
+// they're at the actor origin, which is exactly the tie that made station
+// snapping ambiguous.
+func SplineEndpointsWorld(splineProp parser.Property, tf parser.Transform3f, hasTransform bool) (first, last [3]float64, ok bool) {
+	arr := splineItems(splineProp)
+	if len(arr) < 2 {
+		return first, last, false
+	}
+	firstMap, ok1 := arr[0].(map[string]interface{})
+	lastMap, ok2 := arr[len(arr)-1].(map[string]interface{})
+	if !ok1 || !ok2 {
+		return first, last, false
+	}
+	locFirst, ok1 := extractVec3(firstMap["Location"])
+	locLast, ok2 := extractVec3(lastMap["Location"])
+	if !ok1 || !ok2 {
+		return first, last, false
+	}
+
+	toWorld := func(local [3]float64) [3]float64 {
+		if !hasTransform {
+			return [3]float64{local[0] / 100, local[1] / 100, local[2] / 100}
+		}
+		r := rotateByQuat(local, tf.Rotation)
+		return [3]float64{
+			(r[0] + float64(tf.Translation[0])) / 100,
+			(r[1] + float64(tf.Translation[1])) / 100,
+			(r[2] + float64(tf.Translation[2])) / 100,
+		}
+	}
+	return toWorld(locFirst), toWorld(locLast), true
+}
+
+// SplineCP is a single spline control point in world space (XY only).
+// Tangents are direction vectors in world meters, already rotated by the
+// actor's quaternion but without translation. The frontend converts these
+// to Bezier control points: CP1 = Pos + LeaveTan/3, CP2 = NextPos - NextArriveTan/3.
+type SplineCP struct {
+	Pos       [2]float64
+	LeaveTan  [2]float64
+	ArriveTan [2]float64
+}
+
+// SplineControlPointsWorld extracts raw spline control points with tangents
+// in world space (XY only), plus the average Z. The frontend performs Bezier
+// subdivision using the tangents
+func SplineControlPointsWorld(splineProp parser.Property, tf parser.Transform3f, hasTransform bool) ([]SplineCP, float64) {
+	arr := splineItems(splineProp)
+	if len(arr) < 2 {
+		return nil, 0
+	}
+
+	toWorldPos := func(local [3]float64) [2]float64 {
+		if !hasTransform {
+			return [2]float64{local[0] / 100, local[1] / 100}
+		}
+		r := rotateByQuat(local, tf.Rotation)
+		return [2]float64{
+			(r[0] + float64(tf.Translation[0])) / 100,
+			(r[1] + float64(tf.Translation[1])) / 100,
+		}
+	}
+
+	toWorldTan := func(local [3]float64) [2]float64 {
+		if !hasTransform {
+			return [2]float64{local[0] / 100, local[1] / 100}
+		}
+		r := rotateByQuat(local, tf.Rotation)
+		return [2]float64{r[0] / 100, r[1] / 100}
+	}
+
+	toWorldZ := func(local [3]float64) float64 {
+		if !hasTransform {
+			return local[2] / 100
+		}
+		r := rotateByQuat(local, tf.Rotation)
+		return (r[2] + float64(tf.Translation[2])) / 100
+	}
+
+	type splinePoint struct {
+		loc       [3]float64
+		leaveTan  [3]float64
+		arriveTan [3]float64
+	}
+
+	var pts []splinePoint
+	for _, item := range arr {
+		m, ok := item.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		loc, ok := extractVec3(m["Location"])
+		if !ok {
+			continue
+		}
+		leaveTan, _ := extractVec3(m["LeaveTangent"])
+		arriveTan, _ := extractVec3(m["ArriveTangent"])
+		pts = append(pts, splinePoint{loc: loc, leaveTan: leaveTan, arriveTan: arriveTan})
+	}
+
+	if len(pts) < 2 {
+		return nil, 0
+	}
+
+	cps := make([]SplineCP, len(pts))
+	var zSum float64
+	for i, p := range pts {
+		cps[i] = SplineCP{
+			Pos:       toWorldPos(p.loc),
+			LeaveTan:  toWorldTan(p.leaveTan),
+			ArriveTan: toWorldTan(p.arriveTan),
+		}
+		zSum += toWorldZ(p.loc)
+	}
+
+	return cps, zSum / float64(len(pts))
+}
+
+// SplinePointsWorld subdivides Hermite spline segments into polyline points.
+// Deprecated: prefer SplineControlPointsWorld for accurate curve rendering.
+func SplinePointsWorld(splineProp parser.Property, tf parser.Transform3f, hasTransform bool) [][2]float64 {
+	arr := splineItems(splineProp)
+	if len(arr) < 2 {
+		return nil
+	}
+
+	toWorld := func(local [3]float64) [2]float64 {
+		if !hasTransform {
+			return [2]float64{local[0] / 100, local[1] / 100}
+		}
+		r := rotateByQuat(local, tf.Rotation)
+		return [2]float64{
+			(r[0] + float64(tf.Translation[0])) / 100,
+			(r[1] + float64(tf.Translation[1])) / 100,
+		}
+	}
+
+	// Extract all spline points with their tangents
+	type splinePoint struct {
+		loc       [3]float64
+		leaveTan  [3]float64
+		arriveTan [3]float64
+	}
+
+	var pts []splinePoint
+	for _, item := range arr {
+		m, ok := item.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		loc, ok := extractVec3(m["Location"])
+		if !ok {
+			continue
+		}
+		leaveTan, _ := extractVec3(m["LeaveTangent"])
+		arriveTan, _ := extractVec3(m["ArriveTangent"])
+		pts = append(pts, splinePoint{loc: loc, leaveTan: leaveTan, arriveTan: arriveTan})
+	}
+
+	if len(pts) < 2 {
+		return nil
+	}
+
+	// Subdivide each Hermite segment adaptively.
+	// Straight segments (tangents parallel to segment direction) get just 2 points.
+	// Curved segments get subdivisions proportional to their length.
+	var points [][2]float64
+	for i := 0; i < len(pts)-1; i++ {
+		p0 := pts[i].loc
+		t0 := pts[i].leaveTan
+		p1 := pts[i+1].loc
+		t1 := pts[i+1].arriveTan
+
+		segLen := math.Sqrt(
+			(p1[0]-p0[0])*(p1[0]-p0[0]) +
+				(p1[1]-p0[1])*(p1[1]-p0[1]) +
+				(p1[2]-p0[2])*(p1[2]-p0[2]))
+
+		// Check if segment is straight: tangents parallel to (p1-p0).
+		// For Hermite curves, the path is straight as long as tangents are parallel
+		// to the segment direction — magnitude doesn't affect shape, only parameterization.
+		dx, dy, dz := p1[0]-p0[0], p1[1]-p0[1], p1[2]-p0[2]
+		straight := false
+		if segLen > 0.001 {
+			t0Len := math.Sqrt(t0[0]*t0[0] + t0[1]*t0[1] + t0[2]*t0[2])
+			t1Len := math.Sqrt(t1[0]*t1[0] + t1[1]*t1[1] + t1[2]*t1[2])
+			if t0Len > 0.001 && t1Len > 0.001 {
+				dot0 := (t0[0]*dx + t0[1]*dy + t0[2]*dz) / (t0Len * segLen)
+				dot1 := (t1[0]*dx + t1[1]*dy + t1[2]*dz) / (t1Len * segLen)
+				if dot0 > 0.99 && dot1 > 0.99 {
+					straight = true
+				}
+			}
+		}
+
+		if straight {
+			// Just add start point; end point added by next segment or final point
+			points = append(points, toWorld(p0))
+			continue
+		}
+
+		// Adaptive subdivisions: 2 for short segments, up to 12 for long ones
+		subdivs := 4
+		if segLen > 200 {
+			subdivs = 8
+		}
+		if segLen > 800 {
+			subdivs = 12
+		}
+
+		// Hermite interpolation: H(t) = h00*P0 + h10*T0 + h01*P1 + h11*T1
+		// h00 = 2t³-3t²+1, h10 = t³-2t²+t, h01 = -2t³+3t², h11 = t³-t²
+		for s := 0; s < subdivs; s++ {
+			t := float64(s) / float64(subdivs)
+			t2 := t * t
+			t3 := t2 * t
+			h00 := 2*t3 - 3*t2 + 1
+			h10 := t3 - 2*t2 + t
+			h01 := -2*t3 + 3*t2
+			h11 := t3 - t2
+
+			p := [3]float64{
+				h00*p0[0] + h10*t0[0] + h01*p1[0] + h11*t1[0],
+				h00*p0[1] + h10*t0[1] + h01*p1[1] + h11*t1[1],
+				h00*p0[2] + h10*t0[2] + h01*p1[2] + h11*t1[2],
+			}
+			points = append(points, toWorld(p))
+		}
+	}
+	// Add the final point
+	points = append(points, toWorld(pts[len(pts)-1].loc))
+	return points
+}
+
+// SplineAvgZWorld returns the average Z (meters) of all spline points in world space.
+func SplineAvgZWorld(splineProp parser.Property, tf parser.Transform3f, hasTransform bool) float64 {
+	arr := splineItems(splineProp)
+	if len(arr) == 0 {
+		return 0
+	}
+	toWorldZ := func(local [3]float64) float64 {
+		if !hasTransform {
+			return local[2] / 100
+		}
+		r := rotateByQuat(local, tf.Rotation)
+		return (r[2] + float64(tf.Translation[2])) / 100
+	}
+	var sum float64
+	var n int
+	for _, item := range arr {
+		m, ok := item.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		loc, ok := extractVec3(m["Location"])
+		if !ok {
+			continue
+		}
+		sum += toWorldZ(loc)
+		n++
+	}
+	if n == 0 {
+		return 0
+	}
+	return sum / float64(n)
+}
+
+func splineLengthFromProperty(p parser.Property) float64 {
+	arr := splineItems(p)
 	if len(arr) < 2 {
 		return 0
 	}
+
+	// Extract all spline points with their tangents.
+	type splinePoint struct {
+		loc       [3]float64
+		leaveTan  [3]float64
+		arriveTan [3]float64
+	}
+	var pts []splinePoint
+	for _, item := range arr {
+		m, ok := item.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		loc, ok := extractVec3(m["Location"])
+		if !ok {
+			continue
+		}
+		leaveTan, _ := extractVec3(m["LeaveTangent"])
+		arriveTan, _ := extractVec3(m["ArriveTangent"])
+		pts = append(pts, splinePoint{loc: loc, leaveTan: leaveTan, arriveTan: arriveTan})
+	}
+	if len(pts) < 2 {
+		return 0
+	}
+
 	var totalLength float64
-	for i := 0; i < len(arr)-1; i++ {
-		p1, ok1 := arr[i].(map[string]interface{})
-		p2, ok2 := arr[i+1].(map[string]interface{})
-		if !ok1 || !ok2 {
+	for i := 0; i < len(pts)-1; i++ {
+		p0 := pts[i].loc
+		t0 := pts[i].leaveTan
+		p1 := pts[i+1].loc
+		t1 := pts[i+1].arriveTan
+
+		dx, dy, dz := p1[0]-p0[0], p1[1]-p0[1], p1[2]-p0[2]
+		segLen := math.Sqrt(dx*dx + dy*dy + dz*dz)
+
+		// Check if segment is straight: tangents parallel to (p1-p0).
+		straight := false
+		if segLen > 0.001 {
+			t0Len := math.Sqrt(t0[0]*t0[0] + t0[1]*t0[1] + t0[2]*t0[2])
+			t1Len := math.Sqrt(t1[0]*t1[0] + t1[1]*t1[1] + t1[2]*t1[2])
+			if t0Len > 0.001 && t1Len > 0.001 {
+				dot0 := (t0[0]*dx + t0[1]*dy + t0[2]*dz) / (t0Len * segLen)
+				dot1 := (t1[0]*dx + t1[1]*dy + t1[2]*dz) / (t1Len * segLen)
+				if dot0 > 0.99 && dot1 > 0.99 {
+					straight = true
+				}
+			}
+		}
+
+		if straight {
+			totalLength += segLen
 			continue
 		}
-		loc1, ok1 := extractVec3(p1["Location"])
-		loc2, ok2 := extractVec3(p2["Location"])
-		if !ok1 || !ok2 {
-			continue
+
+		// Hermite interpolation with enough subdivisions for accurate arc length.
+		// H(t) = h00*P0 + h10*T0 + h01*P1 + h11*T1
+		const subdivs = 32
+		var prev [3]float64 = p0
+		for s := 1; s <= subdivs; s++ {
+			t := float64(s) / float64(subdivs)
+			t2 := t * t
+			t3 := t2 * t
+			h00 := 2*t3 - 3*t2 + 1
+			h10 := t3 - 2*t2 + t
+			h01 := -2*t3 + 3*t2
+			h11 := t3 - t2
+
+			pt := [3]float64{
+				h00*p0[0] + h10*t0[0] + h01*p1[0] + h11*t1[0],
+				h00*p0[1] + h10*t0[1] + h01*p1[1] + h11*t1[1],
+				h00*p0[2] + h10*t0[2] + h01*p1[2] + h11*t1[2],
+			}
+			px, py, pz := pt[0]-prev[0], pt[1]-prev[1], pt[2]-prev[2]
+			totalLength += math.Sqrt(px*px + py*py + pz*pz)
+			prev = pt
 		}
-		dx := loc2[0] - loc1[0]
-		dy := loc2[1] - loc1[1]
-		dz := loc2[2] - loc1[2]
-		totalLength += math.Sqrt(dx*dx + dy*dy + dz*dz)
 	}
 	return totalLength / 100
 }
@@ -263,6 +620,43 @@ func GetPropObjectRefPathName(obj *parser.SaveObject, name string) (string, bool
 	return pn, ok
 }
 
+// GetPropText reads a TextProperty and returns the culture-invariant string.
+// Returns ("", true) if the property exists but has no text value (e.g. an unnamed station).
+func GetPropText(obj *parser.SaveObject, name string) (string, bool) {
+	if obj.Properties == nil {
+		return "", false
+	}
+	p, ok := obj.Properties[name]
+	if !ok {
+		return "", false
+	}
+	m, ok := p.Value.(map[string]interface{})
+	if !ok {
+		return "", false
+	}
+	if has, ok := m["hasCultureInvariantString"]; ok {
+		if b, ok := has.(bool); ok && b {
+			if v, ok := m["value"].(string); ok {
+				return v, true
+			}
+		}
+	}
+	return "", true // property exists but has no text value
+}
+
+// GetPropEnum reads an EnumProperty and returns its value as a string.
+func GetPropEnum(obj *parser.SaveObject, name string) (string, bool) {
+	if obj.Properties == nil {
+		return "", false
+	}
+	p, ok := obj.Properties[name]
+	if !ok {
+		return "", false
+	}
+	v, ok := p.Value.(string)
+	return v, ok
+}
+
 // GetPropArray reads an array property as []interface{}. ArrayProperty values
 // come wrapped as map[string]interface{}{"type":..., "count":..., "items": [...]}.
 func GetPropArray(obj *parser.SaveObject, name string) ([]interface{}, bool) {
@@ -290,6 +684,41 @@ func GetPropArray(obj *parser.SaveObject, name string) ([]interface{}, bool) {
 	return nil, false
 }
 
+// GetPropMap reads a MapProperty and returns it as a map[string]interface{}.
+// The parser wraps MapProperty values with "type" and "entries" keys.
+func GetPropMap(obj *parser.SaveObject, name string) (map[string]interface{}, bool) {
+	if obj.Properties == nil {
+		return nil, false
+	}
+	p, ok := obj.Properties[name]
+	if !ok {
+		return nil, false
+	}
+	if m, ok := p.Value.(map[string]interface{}); ok {
+		return m, true
+	}
+	return nil, false
+}
+
+// GetPropStruct reads a StructProperty and returns its inner value as a map.
+func GetPropStruct(obj *parser.SaveObject, name string) (interface{}, bool) {
+	if obj.Properties == nil {
+		return nil, false
+	}
+	p, ok := obj.Properties[name]
+	if !ok {
+		return nil, false
+	}
+	if m, ok := p.Value.(map[string]interface{}); ok {
+		// StructProperty wraps as {"type": "...", "value": {...}}
+		if inner, ok := m["value"].(map[string]interface{}); ok {
+			return inner, true
+		}
+		return m, true
+	}
+	return nil, false
+}
+
 // CleanTypeName extracts a short display name from a type path.
 func CleanTypeName(typePath string) string {
 	shortName := typePath
@@ -298,29 +727,17 @@ func CleanTypeName(typePath string) string {
 	}
 	shortName = strings.TrimSuffix(shortName, "_C")
 	if idx := strings.LastIndex(shortName, "."); idx >= 0 {
-		suffix := shortName[idx+1:]
-		prefix := shortName[:idx]
-		if strings.HasPrefix(suffix, prefix) {
-			shortName = suffix
-		} else {
-			shortName = suffix
-		}
+		shortName = shortName[idx+1:]
 	}
-	if strings.HasPrefix(shortName, "Build_") {
-		shortName = shortName[6:]
-	}
+	shortName = strings.TrimPrefix(shortName, "Build_")
 	return shortName
 }
 
 // FormatDisplayName converts a type path to a human-readable name.
 func FormatDisplayName(typePath string) string {
 	shortName := CleanTypeName(typePath)
-	if strings.HasPrefix(shortName, "BP_") {
-		shortName = shortName[3:]
-	}
-	if strings.HasPrefix(shortName, "FG") {
-		shortName = shortName[2:]
-	}
+	shortName = strings.TrimPrefix(shortName, "BP_")
+	shortName = strings.TrimPrefix(shortName, "FG")
 	formatted := strings.ReplaceAll(shortName, "_", " ")
 	// Split camelCase into words.
 	formatted = insertSpaceBeforeCapital(formatted)

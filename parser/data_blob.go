@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"sync"
 )
 
 // Property is a single parsed property: its type plus the decoded value.
@@ -14,14 +15,14 @@ type Property struct {
 
 // SaveObject is one object decoded out of the data blob.
 type SaveObject struct {
-	Index                          int
-	Properties                     map[string]Property
-	BinarySize                     int32
-	DataStartVPos                  int64
-	UseCompleteTagType             bool
-	SaveCustomVersion              int32
+	Index                               int
+	Properties                          map[string]Property
+	BinarySize                          int32
+	DataStartVPos                       int64
+	UseCompleteTagType                  bool
+	SaveCustomVersion                   int32
 	ShouldMigrateObjectRefsToPersistent bool
-	Header                         *ObjectHeader
+	Header                              *ObjectHeader
 }
 
 // Properties we don't care about. We still read the header and skip past the
@@ -35,9 +36,8 @@ var skipProperties = map[string]bool{
 	"mAvailableRecipes": true, "mAvailableItemDescriptors": true,
 	"mGlobalPointHistoryValues": true, "mItemsFailedToSink": true,
 	"mHasInitialized": true, "mBlueprintName": true, "mLocalBounds": true,
-	"mStation": true, "mPairedStation": true, "mBuildingTag": true,
+	"mBuildingTag":          false,
 	"mLastInsertedFuelType": true, "mLastEditedBy": true, "mLatestDroneTrips": true,
-	"mStationName": true, "mDockingStationStatus": true,
 	"mHiddenConnections": true, "mNetworkID": true, "mNetworkNodes": true,
 	"mPathNetworkTraversabilityChangelist": true, "mShortcuts": true,
 	"mArbitrarySlotSizes": true, "mFluidBox": true, "mAdjustedSizeDiff": true,
@@ -50,10 +50,10 @@ var skipProperties = map[string]bool{
 	"mCustomizationData": true, "mBlueprintProxy": true,
 	"mConveyorChainActor": true, "mSnappedPassthroughs": true,
 	"mBlueprintDesigner": true, "mTrackGraphID": true,
-	"mTimeSinceStartStopProducing": true, "mLastProductivityMeasurementProduceDuration": true,
-	"mLastProductivityMeasurementDuration": true, "mCurrentProductivityMeasurementDuration": true,
-	"mHasFuelCached": true, "mCurrentFuelAmount": true, "mTopTransform": true,
-	"mPendingPotential": true, "mPipeNetworkID": true,
+	"mTimeSinceStartStopProducing":            true,
+	"mCurrentProductivityMeasurementDuration": true,
+	"mHasFuelCached":                          true, "mCurrentFuelAmount": true, "mTopTransform": true,
+	"mPipeNetworkID": true,
 	// Spline metadata: lengths don't need it.
 	"mSplineMetadata": true,
 }
@@ -68,10 +68,36 @@ var skipPropertyTypes = []string{
 	"BP_BambooTree", "BP_Tree", "BP_Rock",
 }
 
+// skipAllCache memoizes ShouldSkipAllProperties per class name. A save holds
+// millions of objects but only a few thousand distinct class names, and the
+// uncached path runs up to 24 substring scans over a ~100 character path, so
+// re-deciding this for every object was pure waste.
+var (
+	skipAllMu    sync.RWMutex
+	skipAllCache = make(map[string]bool)
+)
+
 func ShouldSkipAllProperties(className string) bool {
 	if className == "" {
 		return false
 	}
+
+	skipAllMu.RLock()
+	v, ok := skipAllCache[className]
+	skipAllMu.RUnlock()
+	if ok {
+		return v
+	}
+
+	v = computeShouldSkipAllProperties(className)
+
+	skipAllMu.Lock()
+	skipAllCache[className] = v
+	skipAllMu.Unlock()
+	return v
+}
+
+func computeShouldSkipAllProperties(className string) bool {
 	if strings.Contains(className, "Cable_Cluster") {
 		return false
 	}
@@ -93,7 +119,6 @@ type DataBlobParser struct {
 	ctx           *VersionContext
 	objectHeaders []ObjectHeader
 	skipProps     map[string]bool
-	mapMode       bool
 }
 
 func NewDataBlobParser(ctx *VersionContext, headers []ObjectHeader, mode string) *DataBlobParser {
@@ -108,7 +133,6 @@ func NewDataBlobParser(ctx *VersionContext, headers []ObjectHeader, mode string)
 		ctx:           ctx,
 		objectHeaders: headers,
 		skipProps:     skip,
-		mapMode:       mode == "MAP",
 	}
 }
 
@@ -212,12 +236,12 @@ func (d *DataBlobParser) StreamObjects(
 		}
 
 		obj := &SaveObject{
-			Index:                          i,
-			Properties:                     properties,
-			BinarySize:                     binarySize,
-			DataStartVPos:                  dataStartVPos,
-			UseCompleteTagType:             d.isCompletePropertyTagType(),
-			SaveCustomVersion:              saveCustomVersion,
+			Index:                               i,
+			Properties:                          properties,
+			BinarySize:                          binarySize,
+			DataStartVPos:                       dataStartVPos,
+			UseCompleteTagType:                  d.isCompletePropertyTagType(),
+			SaveCustomVersion:                   saveCustomVersion,
 			ShouldMigrateObjectRefsToPersistent: shouldMigrate,
 		}
 		if i < len(d.objectHeaders) {

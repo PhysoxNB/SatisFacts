@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>SatisFacts</title>
+    <link rel="icon" type="image/png" href="./src/assets/appicon.png"/>
+    <link rel="stylesheet" href="./src/style.css"/>
+</head>
+<body>
+<div id="app">
+    <div id="sidebar">
+        <div id="sidebar-header">
+            <span class="logo">SatisFacts</span>
+        </div>
+        <nav id="nav">
+            <button class="nav-item active" data-page="home">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                <span data-i18n="nav.home">Home</span>
+            </button>
+            <button class="nav-item" data-page="analyze">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                <span data-i18n="nav.analyze">Analyze</span>
+            </button>
+            <button class="nav-item" data-page="optimize">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                <span data-i18n="nav.optimize">Optimize</span>
+            </button>
+            <button class="nav-item" data-page="depot">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                <span data-i18n="nav.depot">Depot Reorder</span>
+            </button>
+            <button class="nav-item" data-page="belts">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7 13.5 15.5 8.5 10.5 2 17"/><path d="M16 7h6v6"/></svg>
+                <span data-i18n="nav.belts">Belt & Pipe Upgrade</span>
+            </button>
+            <button class="nav-item" data-page="blueprints">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+                <span data-i18n="nav.blueprints">Blueprints</span>
+            </button>
+            <button class="nav-item" data-page="multipliers">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                <span data-i18n="nav.multipliers">Multipliers</span>
+            </button>
+            <button class="nav-item" data-page="settings">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span data-i18n="nav.settings">Settings</span>
+            </button>
+            <button class="nav-item" data-page="mapsettings">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20l-5.45-2.73a1 1 0 0 1-.55-.9V4a1 1 0 0 1 1.45-.9L9 5l6-3 5.45 2.73a1 1 0 0 1 .55.9v12.37a1 1 0 0 1-1.45.9L15 19l-6 3z"/><path d="M9 5v15"/><path d="M15 2v17"/></svg>
+                <span data-i18n="nav.mapsettings">Map Settings</span>
+            </button>
+            <button class="nav-item" data-page="gameconfig">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                <span data-i18n="nav.gameconfig">Game Config</span>
+            </button>
+            <button class="nav-item" data-page="help">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                <span data-i18n="nav.help">Help</span>
+            </button>
+        </nav>
+        <div id="sidebar-footer">
+            <span id="save-file-display" class="muted" data-i18n="sidebar.no_save">No save file selected</span>
+        </div>
+    </div>
+    <div id="content">
+        <div id="lang-switcher">
+            <span class="header-zoom-label" data-i18n="settings.zoom_label">Zoom</span>
+            <select id="header-zoom" class="header-zoom-select" data-i18n-title="settings.zoom_label" title="Zoom">
+                <option value="0.8">80%</option>
+                <option value="0.9">90%</option>
+                <option value="1.0" selected>100%</option>
+                <option value="1.1">110%</option>
+                <option value="1.25">125%</option>
+                <option value="1.5">150%</option>
+            </select>
+            <button class="lang-flag" data-lang="en" title="English"><svg width="20" height="13" viewBox="0 0 20 13" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="13" fill="#fff"/><rect width="20" height="1" fill="#b22234"/><rect y="2" width="20" height="1" fill="#b22234"/><rect y="4" width="20" height="1" fill="#b22234"/><rect y="6" width="20" height="1" fill="#b22234"/><rect y="8" width="20" height="1" fill="#b22234"/><rect y="10" width="20" height="1" fill="#b22234"/><rect y="12" width="20" height="1" fill="#b22234"/><rect width="8" height="7" fill="#3c3b6e"/></svg></button>
+            <button class="lang-flag" data-lang="de" title="Deutsch"><svg width="20" height="13" viewBox="0 0 5 3" xmlns="http://www.w3.org/2000/svg"><rect width="5" height="1" fill="#000"/><rect y="1" width="5" height="1" fill="#dd0000"/><rect y="2" width="5" height="1" fill="#ffce00"/></svg></button>
+        </div>
+        <div id="save-error-banner" class="save-error-banner hidden">
+            <strong data-i18n="save_error.strong">This save file could not be parsed.</strong> <span data-i18n="save_error.detail">It may be corrupt, truncated, or from an unsupported game version. All operations are disabled — please select a different save file.</span>
+        </div>
+        <div id="page-home" class="page active">
+            <h1 data-i18n="home.title">Save File Selection</h1>
+            <div class="card">
+                <div class="card-row">
+                    <input type="text" id="dir-path" data-i18n-placeholder="home.save_path_placeholder" placeholder="Save file path..." class="text-input" readonly aria-label="Save file path"/>
+                    <button id="btn-browse-file" class="btn" data-i18n="common.browse">Browse</button>
+                    <button id="btn-sfsaves" class="btn" data-i18n="home.sf_saves">Satisfactory Saves</button>
+                </div>
+            </div>
+            <div id="save-file-list" class="save-file-list"></div>
+            <div id="home-progress" class="analyze-progress hidden">
+                <div class="analyze-progress-bar">
+                    <div id="home-progress-fill" class="analyze-progress-fill"></div>
+                </div>
+                <span id="home-progress-phase" class="muted" data-i18n="common.ready">Ready</span>
+            </div>
+            <div id="recent-saves" class="recent-saves hidden">
+                <h2 data-i18n="home.recent_saves">Recent Saves</h2>
+                <div id="recent-saves-list" class="save-file-list"></div>
+            </div>
+            <div id="save-info-panel" class="save-info-panel hidden">
+                <h2 data-i18n="home.save_info">Save Information</h2>
+                <div id="save-info-grid" class="info-grid"></div>
+            </div>
+            <div id="session-warning" class="session-warning hidden">
+                <div class="session-warning-header">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--orange)" stroke-width="2"><path d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"/></svg>
+                    <span data-i18n="session.issues_detected">Session name issues detected</span>
+                </div>
+                <div id="session-warning-issues" class="session-warning-issues"></div>
+                <div id="session-warning-fix" class="session-warning-fix">
+                    <label class="muted" data-i18n="session.new_name">New session name:</label>
+                    <div class="card-row">
+                        <input type="text" id="session-fix-input" class="text-input" data-i18n-placeholder="session.fix_placeholder" placeholder="Enter fixed session name..." aria-label="Fixed session name"/>
+                        <button id="btn-session-autofix" class="btn" data-i18n="session.auto_fix">Auto-fix</button>
+                    </div>
+                    <label class="checkbox-toggle">
+                        <input type="checkbox" id="session-overwrite"/>
+                        <span data-i18n="session.overwrite">Overwrite original save</span>
+                    </label>
+                    <div id="session-output-toggle" class="output-location-toggle">
+                        <span class="muted" data-i18n="common.output_to">Save output to:</span>
+                        <label class="mode-toggle"><input type="radio" name="session-output" value="exe" checked/><span data-i18n="common.next_to_app">Next to app</span></label>
+                        <label class="mode-toggle"><input type="radio" name="session-output" value="save"/><span data-i18n="common.next_to_save">Next to save</span></label>
+                        <label class="mode-toggle custom-output-toggle" data-i18n-title="common.custom_output_tooltip" title="Set a custom output path in Settings first"><input type="radio" name="session-output" value="custom" disabled/><span data-i18n="common.custom">Custom</span></label>
+                    </div>
+                    <div id="session-progress" class="analyze-progress hidden">
+                        <div class="analyze-progress-bar">
+                            <div id="session-progress-fill" class="analyze-progress-fill"></div>
+                        </div>
+                        <span id="session-progress-phase" class="muted" data-i18n="common.ready">Ready</span>
+                    </div>
+                    <div class="card-row">
+                        <button id="btn-session-fix" class="btn btn-primary" data-i18n="session.save_fixed">Save Fixed Copy</button>
+                        <span id="session-fix-status" class="muted"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-optimize" class="page">
+            <h1 data-i18n="optimize.title">Optimize Save File</h1>
+            <div class="card">
+                <p data-i18n="optimize.description">Typically reduces your save file size by 10–23% by reorganizing how data is stored internally. Everything in your factory stays exactly the same — just the file gets smaller. Large saves also load somewhat faster.</p>
+                <div id="optimize-info" class="info-grid hidden"></div>
+                <div class="card-row">
+                    <button id="btn-optimize" class="btn btn-primary" disabled data-i18n="optimize.button">Optimize Save</button>
+                    <button id="btn-optimize-cancel" class="btn btn-danger hidden" data-i18n="optimize.cancel">Cancel</button>
+                    <span id="optimize-status" class="muted"></span>
+                </div>
+                <div class="output-location-toggle">
+                    <span class="muted" data-i18n="common.output_to">Save output to:</span>
+                    <label class="mode-toggle"><input type="radio" name="opt-output" value="exe" checked/><span data-i18n="common.next_to_app">Next to app</span></label>
+                    <label class="mode-toggle"><input type="radio" name="opt-output" value="save"/><span data-i18n="common.next_to_save">Next to save</span></label>
+                    <label class="mode-toggle custom-output-toggle" data-i18n-title="common.custom_output_tooltip" title="Set a custom output path in Settings first"><input type="radio" name="opt-output" value="custom" disabled/><span data-i18n="common.custom">Custom</span></label>
+                </div>
+                <div id="optimize-progress" class="analyze-progress hidden">
+                    <div class="analyze-progress-bar">
+                        <div id="optimize-progress-fill" class="analyze-progress-fill"></div>
+                    </div>
+                    <span id="optimize-progress-phase" class="muted" data-i18n="common.ready">Ready</span>
+                </div>
+                <div id="optimize-result" class="result-panel hidden"></div>
+            </div>
+        </div>
+
+        <div id="page-analyze" class="page">
+            <h1 data-i18n="analyze.title">Save Analysis Report</h1>
+            <div class="card">
+                <p data-i18n="analyze.description">Generate a detailed HTML analytics report from your save file. The report includes overview, buildings, power, production, logistics, transport, collectibles, and more.</p>
+                <div id="analyze-info" class="info-grid hidden"></div>
+                <div class="card-row" style="margin-top: 14px;">
+                    <button id="btn-analyze" class="btn btn-primary" disabled data-i18n="analyze.generate">Generate Report</button>
+                    <button id="btn-analyze-cancel" class="btn hidden" data-i18n="analyze.cancel">Cancel</button>
+                    <button id="btn-open-report" class="btn" disabled data-i18n="analyze.open_report">Open Report</button>
+                </div>
+                <div class="output-location-toggle">
+                    <span class="muted" data-i18n="common.output_to">Save output to:</span>
+                    <label class="mode-toggle"><input type="radio" name="analyze-output" value="exe" checked/><span data-i18n="common.next_to_app">Next to app</span></label>
+                    <label class="mode-toggle"><input type="radio" name="analyze-output" value="save"/><span data-i18n="common.next_to_save">Next to save</span></label>
+                    <label class="mode-toggle custom-output-toggle" data-i18n-title="common.custom_output_tooltip" title="Set a custom output path in Settings first"><input type="radio" name="analyze-output" value="custom" disabled/><span data-i18n="common.custom">Custom</span></label>
+                </div>
+                <div class="analyze-map-toggle" style="margin-top: 14px;">
+                    <label class="checkbox-toggle">
+                        <input type="checkbox" id="analyze-include-map" checked/>
+                        <span data-i18n="analyze.include_map">Include interactive map</span>
+                    </label>
+                    <p class="muted" data-i18n="analyze.map_faq" style="margin-top: 6px; margin-bottom: 0; line-height: 1.5;">The interactive map adds a visual overview of your factory but significantly increases the HTML file size. For very large saves, the report may exceed 20 MB — Chrome and Opera may not open files this large. If the report fails to open in your browser, disable the map here, or use Firefox (no size limit). You can always re-run the analysis with the map enabled later.</p>
+                </div>
+            </div>
+            <div id="analyze-progress" class="analyze-progress hidden">
+                <div id="analyze-step-list" class="analyze-step-list"></div>
+                <div class="analyze-progress-bar">
+                    <div id="analyze-progress-fill" class="analyze-progress-fill"></div>
+                </div>
+                <span id="analyze-progress-phase" class="muted" data-i18n="common.ready">Ready</span>
+            </div>
+            <div id="analyze-result" class="result-panel hidden"></div>
+        </div>
+
+        <div id="page-depot" class="page">
+            <h1 data-i18n="depot.title">Depot Reorder</h1>
+            <div class="card">
+                <p data-i18n-html="depot.description">Drag and drop to reorder items in the Dimensional Depot. The order in the save file determines the display order in-game. Use the auto-sort buttons to quickly arrange items: <strong>A–Z</strong> sorts alphabetically by name, <strong>Most Space</strong> puts items with the largest stack size first (so big-stack items appear at the top), and <strong>Least Space</strong> does the reverse. You can still drag items manually after auto-sorting.</p>
+                <div class="card-row">
+                    <button id="btn-load-depot" class="btn" disabled data-i18n="depot.load_items">Load Items</button>
+                    <button id="btn-save-depot" class="btn btn-primary" disabled data-i18n="depot.save_reordered">Save Reordered File</button>
+                </div>
+                <div class="output-location-toggle">
+                    <span class="muted" data-i18n="common.output_to">Save output to:</span>
+                    <label class="mode-toggle"><input type="radio" name="depot-output" value="exe" checked/><span data-i18n="common.next_to_app">Next to app</span></label>
+                    <label class="mode-toggle"><input type="radio" name="depot-output" value="save"/><span data-i18n="common.next_to_save">Next to save</span></label>
+                    <label class="mode-toggle custom-output-toggle" data-i18n-title="common.custom_output_tooltip" title="Set a custom output path in Settings first"><input type="radio" name="depot-output" value="custom" disabled/><span data-i18n="common.custom">Custom</span></label>
+                </div>
+                <div id="depot-progress" class="analyze-progress hidden">
+                    <div class="analyze-progress-bar">
+                        <div id="depot-progress-fill" class="analyze-progress-fill"></div>
+                    </div>
+                    <span id="depot-progress-phase" class="muted" data-i18n="common.ready">Ready</span>
+                </div>
+            </div>
+            <div id="depot-sort-wrapper" class="hidden" style="margin-bottom: 16px;">
+                <div class="depot-sort-buttons" id="depot-sort-buttons">
+                    <span class="muted" data-i18n="depot.auto_sort">Auto-sort:</span>
+                    <button id="btn-depot-sort-az" class="btn btn-small" data-i18n="depot.sort_az">A–Z</button>
+                    <button id="btn-depot-sort-most" class="btn btn-small" data-i18n="depot.sort_most">Most Space</button>
+                    <button id="btn-depot-sort-least" class="btn btn-small" data-i18n="depot.sort_least">Least Space</button>
+                </div>
+            </div>
+            <div id="depot-list" class="depot-list">
+                <p class="muted center" data-i18n="depot.click_load">Click "Load Items" to fetch the current depot inventory from the selected save file.</p>
+            </div>
+        </div>
+
+        <div id="page-multipliers" class="page">
+            <h1 data-i18n="mult.title">Game Multipliers</h1>
+            <div class="card">
+                <p data-i18n-html="mult.description">Modify custom game multipliers beyond the in-game UI limits. The game reads these values directly from the save file with no caps, so you can set them as high or low as you want. Multipliers that were not set during world creation (shown as <em>not set</em>) can be added retroactively — the tool inserts the missing property and the game honors it on load.</p>
+                <div class="mult-info-grid">
+                    <div class="mult-info-card">
+                        <h4 data-i18n="mult.recipe_cost_title">Recipe Cost</h4>
+                        <p data-i18n-html="mult.recipe_cost_desc">Multiplies the material cost of all recipes. <strong>1.0</strong> = normal, <strong>2.0</strong> = double cost. In-game slider max: <strong>2.0</strong>. You can set this to any positive value (e.g. <strong>5.0</strong> = 5x cost).</p>
+                    </div>
+                    <div class="mult-info-card">
+                        <h4 data-i18n="mult.se_cost_title">Space Elevator Cost</h4>
+                        <p data-i18n-html="mult.se_cost_desc">Multiplies the parts required for Space Elevator deliveries. <strong>1.0</strong> = normal. In-game slider max: <strong>100.0</strong>. Can be set to any positive value (e.g. <strong>200.0</strong> = 200x cost).</p>
+                    </div>
+                    <div class="mult-info-card">
+                        <h4 data-i18n="mult.power_cost_title">Power Consumption</h4>
+                        <p data-i18n-html="mult.power_cost_desc">Multiplies the power consumed by all machines. <strong>1.0</strong> = normal, <strong>5.0</strong> = 5x power usage. In-game slider max: <strong>5.0</strong>. Can be set to any positive value (e.g. <strong>10.0</strong> = 10x consumption).</p>
+                    </div>
+                </div>
+                <div class="card-section">
+                <div class="card-row">
+                    <button id="btn-load-mult" class="btn" disabled data-i18n="mult.load_current">Load Current Values</button>
+                    <button id="btn-save-mult" class="btn btn-primary" disabled data-i18n="mult.apply_save">Apply & Save</button>
+                </div>
+                <div class="output-location-toggle">
+                    <span class="muted" data-i18n="common.output_to">Save output to:</span>
+                    <label class="mode-toggle"><input type="radio" name="mult-output" value="exe" checked/><span data-i18n="common.next_to_app">Next to app</span></label>
+                    <label class="mode-toggle"><input type="radio" name="mult-output" value="save"/><span data-i18n="common.next_to_save">Next to save</span></label>
+                    <label class="mode-toggle custom-output-toggle" data-i18n-title="common.custom_output_tooltip" title="Set a custom output path in Settings first"><input type="radio" name="mult-output" value="custom" disabled/><span data-i18n="common.custom">Custom</span></label>
+                </div>
+                <div id="mult-progress" class="analyze-progress hidden">
+                    <div class="analyze-progress-bar">
+                        <div id="mult-progress-fill" class="analyze-progress-fill"></div>
+                    </div>
+                    <span id="mult-progress-phase" class="muted" data-i18n="common.ready">Ready</span>
+                </div>
+                </div>
+            </div>
+            <div id="multiplier-list" class="multiplier-list">
+                <p class="muted center" data-i18n="mult.click_load">Click "Load Current Values" to read the current multipliers from the selected save file.</p>
+            </div>
+        </div>
+
+        <div id="page-belts" class="page">
+            <h1 data-i18n="belts.title">Belt & Pipe Upgrade</h1>
+            <div class="card">
+                <p data-i18n="belts.description">Upgrade all conveyor belts, lifts, and pipelines to a higher Mk tier in one click. The tool scans your save, shows you what you have, and upgrades everything to your chosen tier.</p>
+                <div class="card-row">
+                    <button id="btn-load-belts" class="btn" disabled data-i18n="belts.scan">Scan Save</button>
+                    <button id="btn-upgrade-belts" class="btn btn-primary" disabled data-i18n="belts.upgrade_save">Upgrade & Save</button>
+                </div>
+                <div class="output-location-toggle">
+                    <span class="muted" data-i18n="common.output_to">Save output to:</span>
+                    <label class="mode-toggle"><input type="radio" name="belt-output" value="exe" checked/><span data-i18n="common.next_to_app">Next to app</span></label>
+                    <label class="mode-toggle"><input type="radio" name="belt-output" value="save"/><span data-i18n="common.next_to_save">Next to save</span></label>
+                    <label class="mode-toggle custom-output-toggle" data-i18n-title="common.custom_output_tooltip" title="Set a custom output path in Settings first"><input type="radio" name="belt-output" value="custom" disabled/><span data-i18n="common.custom">Custom</span></label>
+                </div>
+                <div id="belt-progress" class="analyze-progress hidden">
+                    <div class="analyze-progress-bar">
+                        <div id="belt-progress-fill" class="analyze-progress-fill"></div>
+                    </div>
+                    <span id="belt-progress-phase" class="muted" data-i18n="common.ready">Ready</span>
+                </div>
+            </div>
+            <div id="belt-inventory" class="belt-inventory">
+                <p class="muted center" data-i18n="belts.click_scan">Click "Scan Save" to detect belts, lifts, and pipelines in the selected save file.</p>
+            </div>
+        </div>
+
+        <div id="page-blueprints" class="page">
+            <h1 data-i18n="bp.title">Blueprint Categories</h1>
+            <div class="card">
+                <p data-i18n-html="bp.description">Copy your blueprint category folders (the organizational structure in the Build Menu → Blueprints tab) from one save to another, or export/import them as a portable preset file. This copies the folder structure, not placed blueprint instances.</p>
+                <p class="muted" style="margin-bottom: 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;" data-i18n="bp.mode_label">Copy Mode</p>
+                <div class="card-row">
+                    <label class="mode-toggle"><input type="radio" name="bp-mode" value="replace" id="bp-mode-replace" checked/><span data-i18n="bp.replace">Replace</span></label>
+                    <label class="mode-toggle"><input type="radio" name="bp-mode" value="merge" id="bp-mode-merge"/><span data-i18n="bp.merge">Merge</span></label>
+                </div>
+                <p class="muted" style="font-size: 13px;" data-i18n-html="bp.replace_desc">
+                    <strong>Replace</strong> — Overwrite all target categories with source categories.<br>
+                    <strong>Merge</strong> — Add source categories that don't exist in target, keep existing ones.
+                </p>
+                <div class="card-row" style="margin-top: 14px;">
+                    <button id="btn-bp-copy" class="btn btn-primary" disabled data-i18n="bp.copy_save">Copy Categories & Save</button>
+                    <button id="btn-bp-reset" class="btn" data-i18n="bp.reset">Reset</button>
+                </div>
+                <div class="output-location-toggle">
+                    <span class="muted" data-i18n="common.output_to">Save output to:</span>
+                    <label class="mode-toggle"><input type="radio" name="bp-output" value="exe" checked/><span data-i18n="common.next_to_app">Next to app</span></label>
+                    <label class="mode-toggle"><input type="radio" name="bp-output" value="save"/><span data-i18n="common.next_to_target">Next to target</span></label>
+                    <label class="mode-toggle custom-output-toggle" data-i18n-title="common.custom_output_tooltip" title="Set a custom output path in Settings first"><input type="radio" name="bp-output" value="custom" disabled/><span data-i18n="common.custom">Custom</span></label>
+                </div>
+            </div>
+            <div id="bp-progress" class="analyze-progress hidden">
+                <div class="analyze-progress-bar">
+                    <div id="bp-progress-fill" class="analyze-progress-fill"></div>
+                </div>
+                <span id="bp-progress-phase" class="muted" data-i18n="common.ready">Ready</span>
+            </div>
+            <div id="bp-result" class="result-panel hidden"></div>
+            <div class="card">
+                <h2 data-i18n="bp.source_title">1. Source (extract categories from)</h2>
+                <div class="card-row">
+                    <label class="mode-toggle"><input type="radio" name="bp-source-type" value="save" id="bp-source-type-save" checked/><span data-i18n="bp.source_save">Save File</span></label>
+                    <label class="mode-toggle"><input type="radio" name="bp-source-type" value="preset" id="bp-source-type-preset"/><span data-i18n="bp.source_preset">Preset File</span></label>
+                </div>
+                <div id="bp-source-save-section">
+                    <div class="card-row">
+                        <input type="text" id="bp-source-path" data-i18n-placeholder="bp.source_placeholder" placeholder="Source save file..." class="text-input" readonly aria-label="Source save file path"/>
+                        <button id="btn-bp-source-browse" class="btn" data-i18n="common.browse">Browse</button>
+                        <button id="btn-bp-source-saves" class="btn" data-i18n="bp.show_saves">Show Saves</button>
+                        <button id="btn-bp-load-source" class="btn btn-primary" disabled data-i18n="bp.load_categories">Load Categories</button>
+                        <button id="btn-bp-export" class="btn" disabled data-i18n="bp.export_preset">Export Preset</button>
+                    </div>
+                    <div id="bp-source-save-list" class="save-file-list hidden"></div>
+                </div>
+                <div id="bp-source-preset-section" class="hidden">
+                    <div class="card-row">
+                        <input type="text" id="bp-preset-path" data-i18n-placeholder="bp.preset_placeholder" placeholder="Preset file (.sfbcat)..." class="text-input" readonly aria-label="Preset file path"/>
+                        <button id="btn-bp-preset-browse" class="btn" data-i18n="common.browse">Browse</button>
+                        <button id="btn-bp-preset-load" class="btn btn-primary" disabled data-i18n="bp.load_preset">Load Preset</button>
+                    </div>
+                </div>
+                <details id="bp-source-details" class="bp-category-details">
+                    <summary id="bp-source-summary" data-i18n="bp.source_categories">Source Categories</summary>
+                    <div id="bp-source-categories" class="bp-category-list">
+                        <p class="muted center" data-i18n="bp.source_hint">Select a source save and click "Load Categories" to preview its blueprint categories.</p>
+                    </div>
+                </details>
+            </div>
+            <div class="card">
+                <h2 data-i18n="bp.target_title">2. Target Save (copy categories into)</h2>
+                <div class="card-row">
+                    <input type="text" id="bp-target-path" data-i18n-placeholder="bp.target_placeholder" placeholder="Target save file..." class="text-input" readonly aria-label="Target save file path"/>
+                    <button id="btn-bp-target-browse" class="btn" data-i18n="common.browse">Browse</button>
+                    <button id="btn-bp-target-saves" class="btn" data-i18n="bp.show_saves">Show Saves</button>
+                </div>
+                <div id="bp-target-save-list" class="save-file-list hidden"></div>
+                <details id="bp-target-details" class="bp-category-details">
+                    <summary id="bp-target-summary" data-i18n="bp.target_categories">Target Categories</summary>
+                    <div id="bp-target-categories" class="bp-category-list">
+                        <p class="muted center" data-i18n="bp.target_hint">Select a target save to preview its current categories.</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+
+        <div id="page-settings" class="page">
+            <h1 data-i18n="settings.title">Settings</h1>
+            <p style="margin-bottom: 16px; color: var(--text-bright);" data-i18n="settings.changes_auto">Changes are saved automatically.</p>
+            <div class="card">
+                <h2 data-i18n="settings.defaults">Defaults</h2>
+                <div class="settings-row">
+                    <label data-i18n="settings.default_output">Default output location</label>
+                    <div class="card-row">
+                        <label class="mode-toggle"><input type="radio" name="settings-output" value="exe" id="settings-output-exe"/><span data-i18n="common.next_to_app">Next to app</span></label>
+                        <label class="mode-toggle"><input type="radio" name="settings-output" value="save" id="settings-output-save"/><span data-i18n="common.next_to_save">Next to save</span></label>
+                        <label class="mode-toggle custom-output-toggle"><input type="radio" name="settings-output" value="custom" id="settings-output-custom" disabled/><span data-i18n="common.custom">Custom</span></label>
+                    </div>
+                </div>
+                <div class="settings-row" id="settings-custom-output-row">
+                    <label data-i18n="settings.custom_path">Custom output path</label>
+                    <div class="card-row">
+                        <input type="text" id="settings-custom-output-path" class="text-input" data-i18n-placeholder="settings.custom_placeholder" placeholder="Choose a directory..." readonly aria-label="Custom output path"/>
+                        <button id="btn-settings-custom-browse" class="btn" data-i18n="common.browse">Browse</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h2 data-i18n="settings.autodetect">Auto-Detect</h2>
+                <p class="muted" style="margin-bottom: 12px;" data-i18n="settings.autodetect_desc">Automatically detect the newest save file in your Satisfactory save directory when it changes.</p>
+                <div class="settings-row">
+                    <label data-i18n="settings.watch_dir">Watch directory</label>
+                    <div class="card-row">
+                        <input type="text" id="settings-autodetect-path" class="path-display" data-i18n-placeholder="settings.autodetect_path_placeholder" placeholder="Not detected yet" aria-label="Watch directory path"/>
+                        <button id="btn-autodetect-browse" class="btn btn-small" data-i18n="common.browse">Browse</button>
+                        <button id="btn-autodetect-reset" class="btn btn-small" data-i18n="settings.reset_default">Reset to Default</button>
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <label data-i18n="settings.auto_detect_toggle">Auto-detect newest save</label>
+                    <label class="checkbox-toggle"><input type="checkbox" id="settings-auto-detect"/><span data-i18n="settings.auto_detect_toggle">Watch for new saves</span></label>
+                </div>
+                <div class="settings-row">
+                    <label data-i18n="settings.auto_analyze_label">Auto-run analysis</label>
+                    <label class="checkbox-toggle"><input type="checkbox" id="settings-auto-analyze" disabled/><span data-i18n="settings.auto_analyze_toggle">Generate report automatically</span></label>
+                </div>
+            </div>
+            <div class="card">
+                <h2 data-i18n="settings.recent_saves">Recent Saves</h2>
+                <div id="settings-recent-list" class="save-file-list">
+                    <p class="muted" data-i18n="settings.no_recent">No recent saves.</p>
+                </div>
+                <div class="card-row" style="margin-top: 10px;">
+                    <button id="btn-clear-recent" class="btn" data-i18n="settings.clear_recent">Clear Recent Saves</button>
+                </div>
+            </div>
+            <div class="card">
+                <h2 data-i18n="settings.about">About & Updates</h2>
+                <div class="settings-row">
+                    <label data-i18n="settings.current_version">Current version</label>
+                    <span id="app-version" class="version-badge">—</span>
+                </div>
+                <div class="settings-row">
+                    <div class="card-row">
+                        <button id="btn-check-updates" class="btn" data-i18n="settings.check_updates">Check for Updates</button>
+                    </div>
+                </div>
+                <div id="update-status" class="update-status hidden"></div>
+            </div>
+        </div>
+
+        <div id="page-mapsettings" class="page">
+            <h1 data-i18n="mapsettings.title">Map Settings</h1>
+            <p style="margin-bottom: 16px; color: var(--text-bright);" data-i18n="mapsettings.description">Customize the colors used for each category in the map view of analysis reports. Changes are saved automatically and applied to new reports.</p>
+            <div id="map-colors-container"></div>
+            <div class="card-row" style="margin-top: 16px;">
+                <button id="btn-reset-map-colors" class="btn" data-i18n="mapsettings.reset">Reset to Defaults</button>
+            </div>
+        </div>
+
+        <div id="page-gameconfig" class="page">
+            <h1 data-i18n="gameconfig.title">Game Config</h1>
+            <p style="margin-bottom: 16px; color: var(--text-bright);" data-i18n="gameconfig.description">Edit Satisfactory's configuration files without hunting for them manually. Changes are applied to Engine.ini and Input.ini in the game's config directory.</p>
+
+            <div class="card">
+                <h2 data-i18n="gameconfig.config_dir">Config Directory</h2>
+                <p class="muted" style="margin-bottom: 12px;" data-i18n="gameconfig.config_dir_desc">SatisFacts auto-detects the config folder. If auto-detection fails (e.g. the game is installed on a different drive), browse for it manually.</p>
+                <div class="card-row">
+                    <input type="text" id="gameconfig-dir" class="path-display" data-i18n-placeholder="gameconfig.config_placeholder" placeholder="Not detected — click Detect or Browse" readonly aria-label="Config directory path"/>
+                    <button id="btn-gameconfig-detect" class="btn btn-small" data-i18n="gameconfig.detect">Detect</button>
+                    <button id="btn-gameconfig-browse" class="btn btn-small" data-i18n="common.browse">Browse</button>
+                </div>
+                <p id="gameconfig-dir-hint" class="muted" style="margin-top: 8px; font-size: 12px;"></p>
+            </div>
+
+            <div class="card">
+                <h2 data-i18n="gameconfig.uobject_title">UObject Limit (Engine.ini)</h2>
+                <p class="muted" style="margin-bottom: 12px;" data-i18n-html="gameconfig.uobject_desc">Increases the Unreal Engine object limit from 2,162,688 to 100,000,000. This prevents crashes on very large factories. A backup is created as <code>Engine.ini.bak</code> before any change.</p>
+                <div id="gameconfig-engine-status" class="config-status-row">
+                    <span class="config-status-badge config-status-unknown">Not checked</span>
+                </div>
+                <div class="card-row" style="margin-top: 12px;">
+                    <button id="btn-gameconfig-engine-apply" class="btn btn-primary" disabled data-i18n="gameconfig.uobject_increase">Increase UObject Limit</button>
+                    <button id="btn-gameconfig-engine-restore" class="btn" disabled data-i18n="gameconfig.restore_backup">Restore from Backup</button>
+                </div>
+                <details class="config-details" id="gameconfig-engine-details" style="margin-top: 12px;">
+                    <summary class="muted" data-i18n="gameconfig.view_engine">View Engine.ini content</summary>
+                    <pre class="config-preview" id="gameconfig-engine-content"></pre>
+                </details>
+            </div>
+
+            <div class="card">
+                <h2 data-i18n="gameconfig.console_title">Console Key (Input.ini)</h2>
+                <p class="muted" style="margin-bottom: 12px;" data-i18n-html="gameconfig.console_desc">Binds a key to open the in-game debug console. Useful for non-QWERTY keyboards where the default §/~/` key is hard to reach. The file is set to read-only after applying (the game deletes contents otherwise). A backup is created as <code>Input.ini.bak</code>.</p>
+                <div id="gameconfig-input-status" class="config-status-row">
+                    <span class="config-status-badge config-status-unknown">Not checked</span>
+                </div>
+                <div class="card-row" style="margin-top: 12px;">
+                    <label style="font-weight: 500;" data-i18n="gameconfig.console_key_label">Console key:</label>
+                    <select id="gameconfig-console-key" class="text-input" style="max-width: 120px;" aria-label="Console key">
+                        <option value="F6">F6</option>
+                        <option value="F7">F7</option>
+                        <option value="F8">F8</option>
+                        <option value="F9">F9</option>
+                        <option value="F10">F10</option>
+                        <option value="F11">F11</option>
+                        <option value="F12">F12</option>
+                        <option value="Tilde">~ (Tilde)</option>
+                        <option value="BackQuote">` (Backtick)</option>
+                    </select>
+                    <button id="btn-gameconfig-input-apply" class="btn btn-primary" disabled data-i18n="gameconfig.set_console_key">Set Console Key</button>
+                    <button id="btn-gameconfig-input-restore" class="btn" disabled data-i18n="gameconfig.restore_backup">Restore from Backup</button>
+                </div>
+                <details class="config-details" id="gameconfig-input-details" style="margin-top: 12px;">
+                    <summary class="muted" data-i18n="gameconfig.view_input">View Input.ini content</summary>
+                    <pre class="config-preview" id="gameconfig-input-content"></pre>
+                </details>
+            </div>
+
+            <div class="card">
+                <h2 data-i18n="gameconfig.file_locations">File Locations</h2>
+                <p class="muted" style="margin-bottom: 8px;" data-i18n="gameconfig.file_locations_desc">If you prefer to edit manually, the files are located at:</p>
+                <p class="muted" style="margin-bottom: 4px; font-size: 13px;"><strong data-i18n="gameconfig.windows">Windows:</strong></p>
+                <p class="config-path-display"><code>%LOCALAPPDATA%\FactoryGame\Saved\Config\Windows\Engine.ini</code></p>
+                <p class="config-path-display"><code>%LOCALAPPDATA%\FactoryGame\Saved\Config\Windows\Input.ini</code></p>
+                <p class="muted" style="margin: 12px 0 4px; font-size: 13px;"><strong data-i18n="gameconfig.linux">Linux (Steam/Proton):</strong></p>
+                <p class="config-path-display"><code>~/.local/share/Steam/steamapps/compatdata/526870/pfx/drive_c/users/steamuser/AppData/Local/FactoryGame/Saved/Config/Windows/</code></p>
+                <p class="muted" style="margin-top: 8px; font-size: 12px;" data-i18n="gameconfig.linux_note">In rare cases (e.g. Steam installed on a different drive), the config may be under the Steam installation path instead. Use Browse to locate it manually.</p>
+            </div>
+        </div>
+
+        <div id="page-help" class="page">
+            <h1 data-i18n="help.title">Help & Information</h1>
+
+            <div class="card">
+                <h2 data-i18n="help.what_is">What is SatisFacts?</h2>
+                <p data-i18n-html="help.what_is_desc">SatisFacts is a desktop tool for inspecting and editing Satisfactory save files (<code>.sav</code>). It can analyze saves, optimize file size, reorder the Dimensional Depot, upgrade belts/lifts/pipes, copy blueprint categories between saves, modify game multipliers beyond UI limits, and fix session name issues — all without modifying the original file (unless you explicitly choose to overwrite).</p>
+            </div>
+
+            <div class="card">
+                <h2 data-i18n="help.getting_started">Getting Started</h2>
+                <ol class="help-list">
+                    <li data-i18n-html="help.step_select"><strong>Select a save file</strong> — Go to the <em>Home</em> tab and click <em>Browse</em> to pick any <code>.sav</code> file, or click <em>Satisfactory Saves</em> to open your default save directory. You can also drag and drop a <code>.sav</code> file anywhere onto the window.</li>
+                    <li data-i18n-html="help.step_view"><strong>View save info</strong> — Once loaded, the file name, size, session name, and save version are displayed on the Home page.</li>
+                    <li data-i18n-html="help.step_run"><strong>Run a feature</strong> — Navigate to any tab (Analyze, Optimize, Depot, Belts, Blueprints, Multipliers) and follow the instructions on that page.</li>
+                    <li data-i18n-html="help.step_output"><strong>Choose output location</strong> — Each feature lets you save the result <em>next to the app</em>, <em>next to the original save</em>, or in a <em>custom folder</em>. The tool never overwrites your original unless explicitly stated.</li>
+                    <li data-i18n-html="help.step_chain"><strong>Chain operations</strong> — After running one operation, the next operation can optionally chain onto the previous output file instead of starting from the original.</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h2 data-i18n="help.how_it_works">How It Works</h2>
+                <p data-i18n="help.how_desc">Satisfactory save files are compressed binary archives containing a header (metadata) and body (game objects). SatisFacts:</p>
+                <ol class="help-list">
+                    <li data-i18n-html="help.how_parse"><strong>Parses</strong> the save file — decompresses zlib chunks, reads the header, and parses object data.</li>
+                    <li data-i18n-html="help.how_modify"><strong>Modifies</strong> the in-memory representation — reordering, patching values, replacing class names, etc.</li>
+                    <li data-i18n-html="help.how_reserialize"><strong>Re-serializes</strong> — writes the modified data back, recompressing with zlib.</li>
+                    <li data-i18n-html="help.how_write"><strong>Writes</strong> a new <code>.sav</code> file with the appropriate suffix (<code>_optimized</code>, <code>_reordered</code>, <code>_upgraded</code>, <code>_multipliers</code>, <code>_blueprints</code>, <code>_sessionfix</code>).</li>
+                </ol>
+                <p data-i18n-html="help.how_note">The original save file is never modified unless you explicitly choose <em>Overwrite original save</em> (only available for session name fix).</p>
+            </div>
+
+            <div class="card">
+                <h2 data-i18n="help.safety">Safety & Backups</h2>
+                <ul class="help-list">
+                    <li data-i18n-html="help.safety_new">All operations create a <strong>new file</strong> by default — your original save is untouched.</li>
+                    <li data-i18n-html="help.safety_suffix">Each output file is named with a suffix (e.g. <code>Save1.2_optimized.sav</code>) so you can identify what was done.</li>
+                    <li data-i18n-html="help.safety_chain">The chaining feature lets you apply multiple operations in sequence without manually renaming files.</li>
+                    <li data-i18n-html="help.safety_corrupt">If a save file is corrupt or unparseable, all operation buttons are disabled and a red error banner appears.</li>
+                    <li data-i18n-html="help.safety_backup">Always keep backups of your saves before applying edits, just in case.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2 data-i18n="help.tips">Tips</h2>
+                <ul class="help-list">
+                    <li data-i18n-html="help.tip_drag"><strong>Drag & drop</strong> — Drop any <code>.sav</code> file onto the window to load it instantly.</li>
+                    <li data-i18n-html="help.tip_autodetect"><strong>Auto-detect</strong> — Enable in Settings to automatically load the newest save from your Satisfactory save directory whenever it changes. It waits until a save has finished writing and ignores files this app creates.</li>
+                    <li data-i18n-html="help.tip_autoanalyze"><strong>Auto-analyze</strong> — When auto-detect is on, you can also auto-generate a report each time a new save is detected.</li>
+                    <li data-i18n-html="help.tip_output"><strong>Output location</strong> — Set a default in Settings, or override per-operation using the radio toggles on each page.</li>
+                    <li data-i18n-html="help.tip_recent"><strong>Recent saves</strong> — Recently loaded saves appear on the Home page and in Settings for quick access.</li>
+                    <li data-i18n-html="help.tip_controls"><strong>Language, zoom and updates</strong> — Switch language and zoom in the top right. Check for new versions on the Settings page.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <details class="faq-dropdown">
+                    <summary><h2 data-i18n="help.features">Features</h2></summary>
+
+                <h3 data-i18n="help.feat_analyze">Analyze</h3>
+                <p data-i18n="help.feat_analyze_desc">Generates a detailed HTML report from your save file. The report includes overview stats, buildings, power, manufacturing, storage, logistics, transport, collectibles, and more.</p>
+                <ul class="help-list">
+                    <li data-i18n-html="help.feat_analyze_report">The report has 14 tabs in order: overview (save info, colony summary, custom map settings), structures (foundations, walls, beams, lights, signs), buildings (every building categorized by function), clock speeds (overclock/underclock distributions, somersloop usage), power (generation, consumption, grid balance), extraction (miners and fluid extractors with resources and purities), manufacturing (recipe efficiency, bottlenecks), storage (container contents and fill levels), logistics (belts, pipes, splitters, mergers), transport (trains, vehicles, drones with route distances), nuclear (fuel, waste, production rates), collectibles (power slugs, somersloops, mercer spheres, crash sites), extras (space elevator, milestones, MAM research, AWESOME Sink, player stats), and map (interactive factory map with filters).</li>
+                </ul>
+                <p data-i18n-html="help.feat_analyze_after">After generation, click <em>Open Report</em> to view it in your browser. Very large saves can produce big reports: if one won't open, use Firefox, or untick <em>Include interactive map</em> and generate it again.</p>
+
+                <h3 data-i18n="help.feat_optimize">Optimize</h3>
+                <p data-i18n-html="help.feat_optimize_desc">Typically reduces save file size by 10–23% by reorganizing how data is stored internally. Your factory, buildings, and all game objects remain <strong>exactly the same</strong> — only the file gets smaller. Large saves also load somewhat faster. The game loads optimized saves normally.</p>
+
+                <h3 data-i18n="help.feat_depot">Depot Reorder</h3>
+                <p data-i18n="help.feat_depot_desc">Drag and drop to reorder items in the Dimensional Depot, or use the auto-sort buttons (A–Z, Most Space, Least Space). The order in the save file determines the display order in-game. Load items, rearrange them, preview the changes, and save a new file.</p>
+
+                <h3 data-i18n="help.feat_belts">Belt & Pipe Upgrade</h3>
+                <p data-i18n-html="help.feat_belts_desc">Upgrade all conveyor belts, lifts, and pipelines to a higher Mk tier in one click. The tool scans your save for all belts/lifts/pipes, shows you the inventory by Mk level, and lets you choose a target tier. Everything is upgraded in-place — no structural changes to the save.</p>
+                <ul class="help-list">
+                    <li data-i18n-html="help.feat_belts_hub"><strong>HUB Tier detection</strong> — The tool detects which tiers you've unlocked and warns if you try to upgrade above them. Enable <em>Allow upgrading above unlocked tiers</em> to override.</li>
+                    <li data-i18n-html="help.feat_belts_pipes"><strong>Pipelines</strong> — Only 2 tiers exist. Mk1 pipes can be upgraded to Mk2.</li>
+                    <li data-i18n-html="help.feat_belts_modded"><strong>Modded content</strong> — Belts, lifts, or pipes from mods (e.g. modded Mk3+ pipes) are detected and listed but cannot be upgraded. They are left untouched in the output save.</li>
+                </ul>
+
+                <h3 data-i18n="help.feat_blueprints">Blueprint Categories</h3>
+                <p data-i18n-html="help.feat_blueprints_desc">Copy your blueprint category folders (the organizational structure in Build Menu → Blueprints tab) from one save to another, or export them as a portable <code>.sfbcat</code> preset file that can be imported into any other save. This copies the <em>folder structure</em>, not placed blueprint instances.</p>
+                <ul class="help-list">
+                    <li data-i18n-html="help.feat_blueprints_replace"><strong>Replace</strong> — Overwrite all target categories with source categories.</li>
+                    <li data-i18n-html="help.feat_blueprints_merge"><strong>Merge</strong> — Add source categories that don't exist in target, keeping existing ones. Duplicates are skipped (case-insensitive).</li>
+                    <li data-i18n-html="help.feat_blueprints_preset"><strong>Preset files (.sfbcat)</strong> — Export categories from a save to a portable preset file, then import them into any other save later. Share your folder structure with friends without sending the whole save.</li>
+                </ul>
+
+                <h3 data-i18n="help.feat_multipliers">Multipliers</h3>
+                <p data-i18n-html="help.feat_multipliers_desc">Modify custom game multipliers beyond the in-game UI limits. The game reads these values directly from the save file with no caps, so you can set them as high or low as you want. Multipliers that were not set during world creation (shown as <em>not set</em>) can be added retroactively — the tool inserts the missing property into the save and the game honors it on load. Load current values, edit them, preview changes, and save.</p>
+
+                <h3 data-i18n="help.feat_session">Session Name Fix</h3>
+                <p data-i18n-html="help.feat_session_desc">Automatically detects session name issues (trailing/leading whitespace, trailing periods, invalid Windows folder characters) when a save is loaded. A warning card appears on the Home page with an auto-fix suggestion. You can edit the name manually, choose to overwrite the original or save a fixed copy, and the fixed save is automatically loaded into the tool afterward.</p>
+
+                <h3 data-i18n="help.feat_gameconfig">Game Config</h3>
+                <p data-i18n-html="help.feat_gameconfig_desc">Edit Satisfactory's configuration files (<code>Engine.ini</code> and <code>Input.ini</code>) without hunting for them manually. The tool auto-detects the config directory and lets you apply two common tweaks with a single click:</p>
+                <ul class="help-list">
+                    <li data-i18n-html="help.feat_uobject"><strong>UObject Limit</strong> — Increases the Unreal Engine object limit from 2,162,688 to 100,000,000. This prevents crashes on very large factories. A backup (<code>Engine.ini.bak</code>) is created before any change.</li>
+                    <li data-i18n-html="help.feat_console"><strong>Console Key</strong> — Binds a key (e.g. F6) to open the in-game debug console. Useful for non-QWERTY keyboards where the default §/~/` key is hard to reach. The file is set to read-only after applying (the game deletes contents otherwise). A backup (<code>Input.ini.bak</code>) is created.</li>
+                </ul>
+                <p data-i18n-html="help.feat_gameconfig_after">Both tweaks can be reverted via the <em>Restore from Backup</em> button. The config directory can also be set manually via <em>Browse</em> if auto-detection fails.</p>
+
+                <h3 data-i18n="help.feat_mapsettings">Map Settings</h3>
+                <p data-i18n-html="help.feat_mapsettings_desc">Customize the colors used for each category in the map view of analysis reports. The map tab in the report shows your factory on a 2D top-down map with buildings, transport lines, power poles, resource nodes, and collectibles. Each category has a default color — use the <em>Map Settings</em> tab to change any of them to your preference.</p>
+                <ul class="help-list">
+                    <li data-i18n-html="help.feat_mapsettings_colors"><strong>Color customization</strong> — 20 categories across 7 groups (Production, Power, Transport, Stations, Special, Build, Collectibles). Each has a color picker. Changes are saved automatically.</li>
+                    <li data-i18n-html="help.feat_mapsettings_apply"><strong>How it works</strong> — Colors are embedded into each new analysis report you generate. Existing reports keep their original colors. Use <em>Reset to Defaults</em> to restore the default color scheme.</li>
+                    <li data-i18n-html="help.feat_mapsettings_collectibles"><strong>Collectible markers</strong> — Collectibles (power slugs, somersloops, mercer spheres, crash sites) appear as arrow markers on the map. Once enabled, they stay visible at every zoom level. Their colors can be customized here too.</li>
+                </ul>
+                </details>
+            </div>
+
+            <div class="card">
+                <details class="faq-dropdown">
+                    <summary><h2 data-i18n="help.faq">FAQ</h2></summary>
+                <div class="faq-item">
+                    <h4 data-i18n="help.faq_safe_q">Is this safe to use with my saves?</h4>
+                    <p data-i18n="help.faq_safe_a">Yes. The tool never modifies your original file (except session name fix with explicit overwrite). All operations produce a new file. Always test the output in-game before relying on it.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 data-i18n="help.faq_detect_q">Will the game detect modified saves?</h4>
+                    <p data-i18n="help.faq_detect_a">In testing, modified saves load normally. However, always make backups before extensive editing.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 data-i18n="help.faq_smaller_q">Why is my optimized save smaller?</h4>
+                    <p data-i18n="help.faq_smaller_a">Objects in the save are sorted by class name, which dramatically improves zlib compression. The data is identical — just ordered differently. No information is lost.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 data-i18n="help.faq_undo_q">Can I undo changes?</h4>
+                    <p data-i18n="help.faq_undo_a">There's no undo — but since the original file is preserved, you can always go back to it. Keep your original saves as backups.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 data-i18n="help.faq_version_q">What save versions are supported?</h4>
+                    <p data-i18n="help.faq_version_a">The tool supports Satisfactory save version 1.0 and later. Older saves may work but are not officially tested.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 data-i18n="help.faq_session_q">The session name fix says my new name is too long — why?</h4>
+                    <p data-i18n="help.faq_session_a">The fix uses a null-padding technique that requires the new name to be shorter than or equal to the original name's byte length. Try a shorter name.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 data-i18n="help.faq_umlaut_q">The session name fix rejects umlauts or special characters — why?</h4>
+                    <p data-i18n="help.faq_umlaut_a">If your current session name only uses plain characters, the save stores it in a format that can't hold umlauts or other special characters. Use plain letters, digits and symbols instead.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 data-i18n="help.faq_custom_q">Why is the "Custom" output option greyed out?</h4>
+                    <p data-i18n="help.faq_custom_a">The Custom output location lets you save files to a directory of your choice. To enable it, go to Settings and click Browse next to Custom output path. Once a folder is set, the Custom option becomes available on every tab.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 data-i18n="help.faq_slow_q">The app is slow or crashes on a very large save — what can I do?</h4>
+                    <p data-i18n="help.faq_slow_a">Save files of several hundred MB decompress to multiple GB in memory. Analysis and Optimize peak at roughly 30× the file size, so 16 GB of RAM generally works for saves up to ~450 MB. Close other applications before processing large saves, or use a machine with more RAM.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 data-i18n="help.faq_mult_high_q">Can I set multipliers higher than the in-game sliders allow?</h4>
+                    <p data-i18n="help.faq_mult_high_a">Yes. The in-game sliders have client-side limits, but the save file stores the raw values. SatisFacts can set them to any value — the game reads them directly with no caps. For example, you can set power consumption to 10x even though the in-game slider maxes out at 5x.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 data-i18n="help.faq_mult_notset_q">A multiplier shows "not set" — what does that mean?</h4>
+                    <p data-i18n="help.faq_mult_notset_a">This means the multiplier was never set — either because the option didn't exist when the world was created, or because no custom multipliers were configured at all. You can still set a value and SatisFacts will insert the missing multiplier into the save file. The game honors it on load. This has been tested with saves missing individual multipliers and saves with no custom multipliers at all — both work without issues.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 data-i18n="help.faq_uobject_crash_q">My game still crashes after increasing the UObject limit — why?</h4>
+                    <p data-i18n-html="help.faq_uobject_crash_a">Very large factories can still run into memory limits, and raising the UObject limit too high can cause memory instability. Check that the change is shown as applied on the Game Config page, and keep regular backups of your saves.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 data-i18n="help.faq_readonly_q">Why is Input.ini set to read-only?</h4>
+                    <p data-i18n-html="help.faq_readonly_a">Satisfactory (Unreal Engine 5) deletes the contents of <code>Input.ini</code> on launch if the file is writable. Setting it to read-only prevents the game from wiping your console key binding. If you need to edit the file manually, temporarily remove the read-only flag, make your changes, then set it back to read-only.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 data-i18n="help.faq_mapcolors_q">My custom map colors don't show in an old report — why?</h4>
+                    <p data-i18n="help.faq_mapcolors_a">Custom colors are embedded into each report at generation time. Reports you generated before changing colors keep their original color scheme. Generate a new report to see your updated colors.</p>
+                </div>
+                </details>
+            </div>
+
+            <div class="card">
+                <h2 data-i18n="help.wrong">Something Went Wrong?</h2>
+                <p data-i18n="help.wrong_desc">If a save file can't be loaded, a feature produces unexpected results, or you encounter any crash or error, I'd love to hear about it. Broken saves, edge cases, and weird save files help make the tool better for everyone.</p>
+                <div class="help-contact">
+                    <a href="https://github.com/PhysoxNB/SatisFacts/issues" class="help-contact-link" target="_blank">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.09.682-.217.682-.482 0-.237-.009-.866-.014-1.699-2.782.602-3.369-1.34-3.369-1.34-.455-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.646.35-1.087.636-1.337-2.22-.252-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12 22 6.477 17.523 2 12 2z"/></svg>
+                        <span data-i18n="help.github">Open a GitHub Issue</span>
+                    </a>
+                    <a href="https://discord.com/users/364893122531950592" class="help-contact-link" target="_blank">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                        <span data-i18n="help.discord">Message me on Discord</span>
+                    </a>
+                </div>
+                <p class="muted" style="margin-top: 12px;" data-i18n="help.report_note">When reporting an issue, please include the save file (if possible), the error message, and what you were trying to do. Saves with unusual structures or from modded games are especially welcome — they help improve compatibility.</p>
+            </div>
+        </div>
+    </div>
+    <div id="chain-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3 data-i18n="chain.title">Which save should this start from?</h3>
+            <p id="chain-modal-text" class="muted"></p>
+            <div class="modal-buttons">
+                <button id="btn-chain-previous" class="btn btn-primary" data-i18n="chain.previous">Chain onto previous output</button>
+                <button id="btn-chain-original" class="btn" data-i18n="chain.original">Start from original save</button>
+                <button id="btn-chain-cancel" class="btn" data-i18n="common.cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <div id="preview-modal" class="modal-overlay hidden">
+        <div class="modal-card modal-card-wide">
+            <h3 id="preview-title" data-i18n="preview.title">Preview Changes</h3>
+            <div id="preview-content" class="preview-content"></div>
+            <div class="modal-buttons">
+                <button id="btn-preview-confirm" class="btn btn-primary" data-i18n="preview.confirm">Apply & Save</button>
+                <button id="btn-preview-cancel" class="btn" data-i18n="common.cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <div id="confirm-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3 id="confirm-title" data-i18n="confirm.title">Confirm</h3>
+            <p id="confirm-message" class="muted"></p>
+            <div class="modal-buttons">
+                <button id="btn-confirm-yes" class="btn btn-primary" data-i18n="common.confirm">Confirm</button>
+                <button id="btn-confirm-no" class="btn" data-i18n="common.cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <div id="info-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3 id="info-title" data-i18n="info.title">Information</h3>
+            <p id="info-message" class="muted"></p>
+            <div class="modal-buttons">
+                <button id="btn-info-ok" class="btn btn-primary" data-i18n="common.ok">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="toast" class="toast hidden"></div>
+    <div id="drop-overlay" class="hidden">
+        <div class="drop-message" data-i18n="drop.message">Drop .sav file to load</div>
+    </div>
+</div>
+<script src="./src/main.js" type="module"></script>
+</body>
+</html>

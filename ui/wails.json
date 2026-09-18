@@ -1,0 +1,19 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "SatisFacts",
+  "outputfilename": "SatisFacts",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "Physox"
+  },
+  "info": {
+    "companyName": "Physox",
+    "productName": "SatisFacts",
+    "productVersion": "2.0.0",
+    "copyright": "Copyright (c) Physox. GPL-3.0.",
+    "comments": "Satisfactory save file analyzer and editor"
+  }
+}

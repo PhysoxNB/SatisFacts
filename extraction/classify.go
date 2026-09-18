@@ -2,9 +2,13 @@ package extraction
 
 import "strings"
 
-// IsBuilding reports whether a typePath is a production building.
-func IsBuilding(typePath string) bool {
-	lower := strings.ToLower(typePath)
+// computeIsBuilding reports whether a lowercased typePath is a production
+// building. Call IsBuilding instead; this is the uncached implementation.
+func computeIsBuilding(lower string) bool {
+	// Subsystem objects (e.g. FGResourceSinkSubsystem) are not buildings.
+	if strings.HasPrefix(lower, "/script/") {
+		return false
+	}
 
 	// Water pumps count, and we check them before the exclusions below so they
 	// don't get caught by the "pump" rule.
@@ -35,6 +39,19 @@ func IsBuilding(typePath string) bool {
 	}
 	// Fluid buffers (industrial/pipe storage tanks) live in the pipe section, not here.
 	if strings.Contains(lower, "fluidbuffer") {
+		return false
+	}
+	// Rail track segments and switch controls are infrastructure, not buildings.
+	// Signals (Block/Path) are kept - they're placeable structures.
+	if strings.Contains(lower, "railroadtrack") || strings.Contains(lower, "switchcontrol") {
+		return false
+	}
+	// Equipment items (e.g. portable resource miner) are not buildings.
+	if strings.Contains(lower, "/equipment/") || strings.HasPrefix(lower, "/game/factorygame/equipment/") {
+		return false
+	}
+	// Blueprint designer's internal storage is not a standalone storage building.
+	if strings.Contains(lower, "storageblueprint") {
 		return false
 	}
 
@@ -69,21 +86,22 @@ func IsBuilding(typePath string) bool {
 		strings.Contains(lower, "smasher") ||
 		strings.Contains(lower, "industrialtank") ||
 		strings.Contains(lower, "pipestoragetank") ||
-		strings.Contains(lower, "flowindicator")
+		strings.Contains(lower, "resourcesink") ||
+		strings.Contains(lower, "elevator")
 }
 
-// IsBlueprintOrSubsystem reports whether a typePath is a blueprint proxy or shortcut.
-func IsBlueprintOrSubsystem(typePath string) bool {
-	lower := strings.ToLower(typePath)
+// computeIsBlueprintOrSubsystem reports whether a lowercased typePath is a
+// blueprint proxy or shortcut. Call IsBlueprintOrSubsystem instead.
+func computeIsBlueprintOrSubsystem(lower string) bool {
 	if strings.Contains(lower, "blueprintproxy") || strings.Contains(lower, "blueprintshortcut") {
 		return !strings.Contains(lower, "storage")
 	}
 	return false
 }
 
-// IsProduction reports whether a typePath is a transport item: belts, pipes, tanks.
-func IsProduction(typePath string) bool {
-	lower := strings.ToLower(typePath)
+// computeIsProduction reports whether a lowercased typePath is a transport
+// item: belts, pipes, tanks. Call IsProduction instead.
+func computeIsProduction(lower string) bool {
 	if strings.Contains(lower, "wall") {
 		return false
 	}
@@ -93,10 +111,14 @@ func IsProduction(typePath string) bool {
 		strings.Contains(lower, "pipestoragetank")
 }
 
-// IsStructure reports whether a typePath is a structural buildable. On top of
-// the obvious shapes it also catches barriers, gates, roofs, fans and vents.
-func IsStructure(typePath string) bool {
-	lower := strings.ToLower(typePath)
+// computeIsStructure reports whether a lowercased typePath is a structural
+// buildable. On top of the obvious shapes it also catches barriers, gates,
+// roofs, fans and vents. Call IsStructure instead.
+func computeIsStructure(lower string) bool {
+	// Subsystem objects (e.g. FUR_Subsystem, LongerBeams_Subsystem) are not structures.
+	if strings.Contains(lower, "_subsystem") {
+		return false
+	}
 	if strings.Contains(lower, "foundationpassthrough") {
 		return false
 	}
@@ -133,10 +155,9 @@ func IsStructure(typePath string) bool {
 		(strings.Contains(lower, "vent") && !strings.Contains(lower, "inventory"))
 }
 
-// StructureCategory returns the category name for a structure type.
-func StructureCategory(typePath string) string {
-	lower := strings.ToLower(typePath)
-
+// computeStructureCategory returns the category name for a lowercased structure
+// type. Call StructureCategory instead.
+func computeStructureCategory(lower string) string {
 	if strings.Contains(lower, "foundationpassthrough") {
 		return "other"
 	}
@@ -179,6 +200,38 @@ func StructureCategory(typePath string) string {
 		return "signs"
 	}
 	return "other"
+}
+
+// computeMapCategory classifies a lowercased typePath into a map category for
+// BuildMapData's "buildings from BuildingFacts" pass. Call
+// classInfoFor(typePath).mapCategory instead; this is the uncached
+// implementation - it used to run inline in BuildMapData's per-instance loop
+// (once per building instance, not once per distinct class name).
+func computeMapCategory(lower string) uint8 {
+	switch {
+	case strings.Contains(lower, "miner") || strings.Contains(lower, "extractor") || strings.Contains(lower, "waterpump") || strings.Contains(lower, "oilpump") || strings.Contains(lower, "frackingsatellite") || strings.Contains(lower, "frackingsmasher"):
+		return MapCatMiner
+	case strings.Contains(lower, "trainstation") || strings.Contains(lower, "trainplatform") || strings.Contains(lower, "truckstation") || strings.Contains(lower, "dronestation") || strings.Contains(lower, "dockingstation"):
+		return MapCatStation
+	case strings.Contains(lower, "generator") || strings.Contains(lower, "biomass") || strings.Contains(lower, "alienpower"):
+		return MapCatPowerGen
+	case strings.Contains(lower, "powerstorage") || strings.Contains(lower, "powerswitch") || strings.Contains(lower, "prioritypowerswitch"):
+		return MapCatPowerStorage
+	case strings.Contains(lower, "railroadblocksignal") || strings.Contains(lower, "railroadpathsignal"):
+		return MapCatSignal
+	case strings.Contains(lower, "elevator") || strings.Contains(lower, "resourcesink") || strings.Contains(lower, "blueprintdesigner") || strings.Contains(lower, "storage") || strings.Contains(lower, "container") || strings.Contains(lower, "depot") || strings.Contains(lower, "industrialtank") || strings.Contains(lower, "pipestoragetank"):
+		return MapCatSpecial
+	case strings.Contains(lower, "pipelinepump") || strings.Contains(lower, "pipepump"):
+		return MapCatPipe
+	case strings.Contains(lower, "pipelinejunction") || strings.Contains(lower, "valve"):
+		return MapCatPipe
+	case strings.Contains(lower, "pipehyperstart") || (strings.Contains(lower, "hypertube") && strings.Contains(lower, "junction")):
+		return MapCatHypertube
+	case strings.Contains(lower, "railroadendstop"):
+		return MapCatRail
+	default:
+		return MapCatBuilding
+	}
 }
 
 // IsBeltPipeSupportItem reports whether a type is one of the belt/pipe supports.

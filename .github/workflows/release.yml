@@ -9,22 +9,107 @@ permissions:
   contents: write
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build-ui:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux/amd64
+            artifact: SatisFacts
+          - os: macos-latest
+            platform: darwin/universal
+            artifact: SatisFacts.app.tar.gz
+          - os: windows-latest
+            platform: windows/amd64
+            artifact: SatisFacts.exe
+    runs-on: ${{ matrix.os }}
+    # Windows defaults to PowerShell, but every step here is written for bash.
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-go@v5
         with:
-          go-version: "1.25"
+          go-version: "1.27.x"
+          cache-dependency-path: ui/go.sum
 
-      - name: Install goversioninfo
-        run: go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
 
-      - name: Build all platforms
+      - name: Install Wails CLI
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.13.0
+
+      - name: Install Linux dependencies
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          export PATH="$PATH:$(go env GOPATH)/bin"
-          ./build.sh
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
+
+      - name: Prepare embedded assets
+        run: |
+          mkdir -p extraction/assets
+          cp assets/Map.webp extraction/assets/Map.webp
+          ./minify_viewer.sh
+
+      - name: Build Wails UI
+        working-directory: ui
+        env:
+          LINUX_TAGS: "-tags webkit2_41"
+        run: |
+          GOPATH_BIN="$(go env GOPATH)/bin"
+          export PATH="$PATH:$GOPATH_BIN"
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            wails build -platform ${{ matrix.platform }} $LINUX_TAGS
+          else
+            wails build -platform ${{ matrix.platform }}
+          fi
+
+      - name: Package Linux binary
+        if: matrix.os == 'ubuntu-latest'
+        working-directory: ui/build/bin
+        run: |
+          cp SatisFacts ../../../${{ matrix.artifact }}
+
+      - name: Package macOS app
+        if: matrix.os == 'macos-latest'
+        working-directory: ui/build/bin
+        run: |
+          tar czf ../../../${{ matrix.artifact }} SatisFacts.app
+
+      - name: Package Windows binary
+        if: matrix.os == 'windows-latest'
+        working-directory: ui/build/bin
+        run: |
+          cp SatisFacts.exe ../../../${{ matrix.artifact }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-${{ matrix.os }}
+          path: ${{ matrix.artifact }}
+
+  release:
+    needs: build-ui
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ui-ubuntu-latest
+          path: dist/
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ui-macos-latest
+          path: dist/
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ui-windows-latest
+          path: dist/
 
       - name: Generate checksums
         run: |
@@ -32,30 +117,12 @@ jobs:
           sha256sum * > checksums.txt
           cat checksums.txt
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: binaries
-          path: dist/
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: binaries
-          path: dist/
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           files: |
+            dist/SatisFacts
+            dist/SatisFacts.app.tar.gz
             dist/SatisFacts.exe
-            dist/SatisFacts-linux-amd64
-            dist/SatisFacts-macos-arm64
-            dist/SatisFacts-macos-amd64
             dist/checksums.txt

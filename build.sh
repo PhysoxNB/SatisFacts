@@ -1,90 +1,57 @@
 #!/usr/bin/env bash
 #
-# Cross-platform build script for SatisFacts.
-# Produces self-contained binaries (data files are embedded via go:embed) into ./dist.
+# Local build script for SatisFacts Wails UI.
+# Builds Linux and Windows binaries into ui/build/bin/.
 #
 # Usage:
-#   ./build.sh            # build for all platforms
-#   ./build.sh linux      # build a single target (linux|windows|macos-arm|macos-intel)
+#   ./build.sh           # build Linux
+#   ./build.sh windows   # cross-compile Windows .exe
+#   ./build.sh all       # build both
 #
 set -euo pipefail
 
-APP="SatisFacts"          # base binary name (linux/macOS)
-WIN_APP="SatisFacts.exe"  # Windows binary name
-OUT="dist"
+UI_DIR="ui"
+GOPATH_BIN="$(go env GOPATH)/bin"
+export PATH="$PATH:$GOPATH_BIN"
+export GOTOOLCHAIN=local
 
-# Optional version string baked into Windows resources / shown by --version if wired up.
-VERSION="${VERSION:-dev}"
+# Copy Map.webp into extraction/assets/ for go:embed
+mkdir -p extraction/assets
+cp assets/Map.webp extraction/assets/Map.webp
 
-# Start fresh: remove previous output and any generated Windows resource file
-# so renamed/stale binaries don't linger between builds.
-echo "Cleaning $OUT/ ..."
-rm -rf "$OUT" resource_windows_amd64.syso
-mkdir -p "$OUT"
+# Minify viewer JS for embedding
+./minify_viewer.sh
 
 build_linux() {
-  echo "Building Linux (amd64)..."
-  GOOS=linux GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o "$OUT/${APP}-linux-amd64" .
+  echo "Building Linux..."
+  cd "$UI_DIR"
+  wails build -platform linux/amd64 -tags webkit2_41
+  cd ..
+  echo "→ $UI_DIR/build/bin/SatisFacts"
 }
 
 build_windows() {
-  echo "Building Windows (amd64)..."
-  # If a versioninfo.json + icon.ico exist, generate the .syso resource so the
-  # .exe gets an icon and version metadata (requires goversioninfo, see build.sh notes).
-  if [ -f versioninfo.json ]; then
-    # Locate goversioninfo: prefer PATH, else fall back to Go's install bin
-    # (GOBIN or GOPATH/bin), which is often not on PATH after `go install`.
-    gvi="$(command -v goversioninfo 2>/dev/null || true)"
-    if [ -z "$gvi" ]; then
-      gobin="$(go env GOBIN)"
-      [ -z "$gobin" ] && gobin="$(go env GOPATH)/bin"
-      [ -x "$gobin/goversioninfo" ] && gvi="$gobin/goversioninfo"
-    fi
-    if [ -n "$gvi" ]; then
-      "$gvi" -o resource_windows_amd64.syso versioninfo.json
-    else
-      echo "  (skipping icon: goversioninfo not found; run 'go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest')"
-    fi
+  echo "Building Windows..."
+  cd "$UI_DIR"
+  # Regenerate icon.ico from appicon.png so the custom SF icon is always used
+  if [ -f build/appicon.png ]; then
+    python3 -c "
+from PIL import Image
+img = Image.open('build/appicon.png')
+img.save('build/windows/icon.ico', format='ICO', sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])
+" 2>/dev/null && echo "  (icon.ico regenerated)" || true
   fi
-  GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o "$OUT/${WIN_APP}" .
+  wails build -platform windows/amd64
+  cd ..
+  echo "→ $UI_DIR/build/bin/SatisFacts.exe"
 }
 
-build_macos_arm() {
-  echo "Building macOS (Apple Silicon)..."
-  GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags "-s -w" -o "$OUT/${APP}-macos-arm64" .
-}
-
-build_macos_intel() {
-  echo "Building macOS (Intel)..."
-  GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o "$OUT/${APP}-macos-amd64" .
-}
-
-target="${1:-all}"
+target="${1:-linux}"
 case "$target" in
-  linux)        build_linux ;;
-  windows)      build_windows ;;
-  macos-arm)    build_macos_arm ;;
-  macos-intel)  build_macos_intel ;;
-  all)
-    build_linux
-    build_windows
-    build_macos_arm
-    build_macos_intel
-    ;;
-  *)
-    echo "Unknown target: $target (expected: linux|windows|macos-arm|macos-intel|all)"
-    exit 1
-    ;;
+  linux)   build_linux ;;
+  windows) build_windows ;;
+  all)     build_linux; build_windows ;;
+  *) echo "Usage: ./build.sh [linux|windows|all]"; exit 1 ;;
 esac
 
-# Generate SHA256 checksums for all release binaries.
-echo "Generating SHA256 checksums..."
-cd "$OUT"
-sha256sum * > checksums.txt
-cd ..
-
-echo "Done. Binaries in ./$OUT:"
-ls -lh "$OUT"
-echo ""
-echo "Checksums:"
-cat "$OUT/checksums.txt"
+echo "Done."

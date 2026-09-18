@@ -3,16 +3,41 @@ package extraction
 import (
 	"bytes"
 	"compress/gzip"
+	_ "embed"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
-	_ "embed"
 )
 
-//go:embed viewer.js
-var viewerJS string
+//go:embed report/viewer_minified.js
+var viewerMinifiedFS []byte
+
+//go:embed assets/Map.webp
+var mapWebP []byte
+
+//go:embed report/report.css
+var reportCSS []byte
+
+// loadViewerJS wraps the pre-minified viewer JS in an IIFE, gzips it,
+// and returns base64-encoded gzip data for embedding in the HTML.
+func loadViewerJS() string {
+	js := "(async function(){'use strict';\n" + string(viewerMinifiedFS) + "\n})();"
+
+	var gzBuf bytes.Buffer
+	gz, err := gzip.NewWriterLevel(&gzBuf, gzip.BestCompression)
+	if err != nil {
+		panic("gzip writer: " + err.Error())
+	}
+	if _, err := gz.Write([]byte(js)); err != nil {
+		panic("gzip write: " + err.Error())
+	}
+	if err := gz.Close(); err != nil {
+		panic("gzip close: " + err.Error())
+	}
+	return base64.StdEncoding.EncodeToString(gzBuf.Bytes())
+}
 
 const htmlTemplate = `<!DOCTYPE html>
 <html lang="en">
@@ -21,410 +46,36 @@ const htmlTemplate = `<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SatisFacts Report</title>
 <style>
-:root {
-  color-scheme: dark;
-  --bg: #0e0e12;
-  --surface: #1a1a24;
-  --surface2: #22222e;
-  --border: #33334a;
-  --text: #e0e0e8;
-  --text-dim: #8888a0;
-  --accent: #00d4ff;
-  --accent2: #ff6464;
-  --green: #00ff80;
-  --orange: #ffa500;
-  --purple: #9370db;
-  --yellow: #ffc800;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-html { background: var(--surface); }
-
-body {
-  background: var(--surface);
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
-  min-height: 100vh;
-}
-
-#loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  font-size: 1.2em;
-  color: var(--accent);
-}
-
-#loading .spinner {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  border: 3px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin-right: 12px;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* #app visibility controlled by JS inline style */
-
-header {
-  background: var(--bg);
-  border-bottom: 2px solid var(--border);
-  padding: 12px 20px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-header .header-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-header h1 {
-  font-size: 1.3em;
-  color: var(--accent);
-  white-space: nowrap;
-}
-
-#search {
-  flex: 1;
-  min-width: 200px;
-  max-width: 400px;
-  padding: 8px 12px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text);
-  font-size: 13px;
-}
-
-#search:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-#search::placeholder { color: var(--text-dim); }
-
-#expert-toggle {
-  padding: 6px 12px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text-dim);
-  cursor: pointer;
-  font-size: 13px;
-  white-space: nowrap;
-  transition: all 0.15s;
-}
-
-#expert-toggle:hover {
-  border-color: var(--accent);
-  color: var(--text);
-}
-
-#expert-toggle.active {
-  background: var(--accent);
-  color: var(--bg);
-  border-color: var(--accent);
-  font-weight: 600;
-}
-
-.type-path-col { display: none; word-break: break-all; }
-body.expert-mode .type-path-col { display: table-cell; }
-
-#tabs {
-  display: flex;
-  gap: 4px;
-  padding: 8px 20px;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-  overflow-x: auto;
-  position: sticky;
-  top: 52px;
-  z-index: 99;
-}
-
-.tab-btn {
-  padding: 8px 16px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  color: var(--text-dim);
-  cursor: pointer;
-  font-size: 13px;
-  white-space: nowrap;
-  transition: all 0.15s;
-}
-
-.tab-btn:hover {
-  background: var(--surface2);
-  color: var(--text);
-}
-
-.tab-btn.active {
-  background: var(--accent);
-  color: var(--bg);
-  font-weight: 600;
-}
-
-.tab-content {
-  display: none;
-  padding: 20px;
-  width: 100%;
-  max-width: 2560px;
-  margin: 0 auto;
-}
-
-.tab-content.active { display: block; }
-
-.section {
-  margin-bottom: 24px;
-}
-
-.section h2 {
-  font-size: 1.1em;
-  color: var(--accent);
-  margin-bottom: 12px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--border);
-}
-
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
-}
-
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: 8px;
-  padding: 12px 16px;
-}
-
-.card .label {
-  font-size: 0.75em;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.card .value {
-  font-size: 1.4em;
-  font-weight: 700;
-  color: var(--text);
-  margin: 4px 0;
-  word-break: break-word;
-  overflow-wrap: break-word;
-}
-
-.card .desc {
-  font-size: 0.8em;
-  color: var(--text-dim);
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-  table-layout: fixed;
-}
-
-thead th {
-  background: var(--surface2);
-  color: var(--text-dim);
-  text-align: left;
-  padding: 8px 12px;
-  cursor: pointer;
-  user-select: none;
-  border-bottom: 2px solid var(--border);
-  white-space: nowrap;
-  position: sticky;
-  top: 0;
-}
-
-thead th:hover { color: var(--accent); }
-
-thead th.sort-asc::after { content: " \25B2"; color: var(--accent); }
-thead th.sort-desc::after { content: " \25BC"; color: var(--accent); }
-
-tbody td {
-  padding: 6px 12px;
-  border-bottom: 1px solid var(--border);
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-tbody tr:hover { background: var(--surface2); }
-
-.scrollable {
-  max-height: 600px;
-  overflow-y: auto;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-}
-
-.scrollable table thead th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-.badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.8em;
-  font-weight: 600;
-}
-
-.badge.green { background: var(--green); color: var(--bg); }
-.badge.orange { background: var(--orange); color: var(--bg); }
-.badge.red { background: var(--accent2); color: var(--bg); }
-.badge.yellow { background: #ffc107; color: var(--bg); }
-.badge.blue { background: #4fc3f7; color: var(--bg); }
-.badge.gray { background: #666; color: var(--text); }
-
-.bar-container {
-  display: flex;
-  align-items: center;
-  position: relative;
-  height: 20px;
-  background: var(--surface2);
-  border-radius: 4px;
-  overflow: hidden;
-  min-width: 80px;
-}
-
-.bar-fill {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.3s;
-}
-
-.bar-label {
-  position: absolute;
-  right: 6px;
-  font-size: 0.75em;
-  color: var(--text);
-  text-shadow: 0 0 4px rgba(0,0,0,0.8);
-}
-
-details {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  margin-bottom: 8px;
-  padding: 8px 12px;
-}
-
-details summary {
-  cursor: pointer;
-  color: var(--text);
-  font-weight: 600;
-  padding: 4px 0;
-}
-
-details summary:hover { color: var(--accent); }
-
-details[open] { padding-bottom: 12px; }
-
-details > table, details > .scrollable {
-  margin-top: 8px;
-}
-
-.stat-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.stat-row .label { color: var(--text-dim); }
-.stat-row .value { font-weight: 600; }
-
-.stat-row.overclocked .value { color: var(--accent2); }
-.stat-row.underclocked .value { color: #6495ED; }
-
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--text-dim);
-  font-size: 1.1em;
-}
-
-.filter-bar input[type="text"],
-.filter-bar select {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text);
-  font-size: 13px;
-}
-
-.filter-bar input[type="text"]:focus,
-.filter-bar select:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.filter-bar input[type="text"]::placeholder { color: var(--text-dim); }
-
-.filter-bar select option {
-  background: var(--surface);
-  color: var(--text);
-}
-
-.filter-bar button {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text);
-  cursor: pointer;
-  font-size: 13px;
-  transition: background 0.15s;
-}
-
-.filter-bar button:hover:not(:disabled) {
-  background: var(--border);
-}
-
-.filter-bar button:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-@media (max-width: 768px) {
-  .card-grid { grid-template-columns: 1fr 1fr; }
-  .tab-content { padding: 12px; }
-  #tabs { padding: 8px 12px; }
-  header { padding: 8px 12px; }
-  #search { max-width: none; }
-}
+__CSS__
 </style>
 </head>
 <body>
-<div id="loading"><span class="spinner"></span>Decompressing save data...</div>
+<!-- Loading overlay: shown until data.js finishes decoding the embedded data.
+     The #app div is populated by JS after data loads. -->
+<div id="loading" data-i18n="header.loading"><span class="spinner"></span>Decompressing save data...</div>
 <div id="app">
-  <header>
-    <div class="header-row">
-      <h1 id="title">Save Report</h1>
-      <input type="text" id="search" placeholder="Search in current tab...">
-      <button id="expert-toggle" title="Show/hide full type paths">Expert Mode</button>
-    </div>
-  </header>
-  <nav id="tabs"></nav>
+  <div class="sticky-header">
+    <header>
+      <div class="header-row">
+        <h1 id="title">Save Report</h1>
+        <div class="header-controls">
+          <div class="search-wrap">
+            <input type="text" id="search" data-i18n-placeholder="header.search_placeholder" placeholder="Search across all tabs...">
+            <button class="search-clear" id="search-clear" data-i18n-title="header.clear_search" title="Clear search">&times;</button>
+            <div id="search-dropdown" class="search-dropdown"></div>
+          </div>
+          <div id="lang-switcher">
+            <button class="lang-flag" data-lang="en" title="English"><svg width="20" height="13" viewBox="0 0 20 13" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="13" fill="#fff"/><rect width="20" height="1" fill="#b22234"/><rect y="2" width="20" height="1" fill="#b22234"/><rect y="4" width="20" height="1" fill="#b22234"/><rect y="6" width="20" height="1" fill="#b22234"/><rect y="8" width="20" height="1" fill="#b22234"/><rect y="10" width="20" height="1" fill="#b22234"/><rect y="12" width="20" height="1" fill="#b22234"/><rect width="8" height="7" fill="#3c3b6e"/></svg></button>
+            <button class="lang-flag" data-lang="de" title="Deutsch"><svg width="20" height="13" viewBox="0 0 5 3" xmlns="http://www.w3.org/2000/svg"><rect width="5" height="1" fill="#000"/><rect y="1" width="5" height="1" fill="#dd0000"/><rect y="2" width="5" height="1" fill="#ffce00"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <nav id="tabs"></nav>
+  </div>
+  <!-- Tab content containers: one per tab. IDs follow the pattern tab-<id>.
+     Note: tab-production is the Extraction tab (internal ID kept for backwards
+     compatibility after the rename). Populated by render functions in viewer JS. -->
   <div id="tab-overview" class="tab-content"></div>
   <div id="tab-structures" class="tab-content"></div>
   <div id="tab-buildings" class="tab-content"></div>
@@ -433,49 +84,95 @@ details > table, details > .scrollable {
   <div id="tab-production" class="tab-content"></div>
   <div id="tab-manufacturing" class="tab-content"></div>
   <div id="tab-storage" class="tab-content"></div>
+  <div id="tab-logistics" class="tab-content"></div>
   <div id="tab-transport" class="tab-content"></div>
-  <div id="tab-map" class="tab-content"></div>
   <div id="tab-nuclear" class="tab-content"></div>
   <div id="tab-collectibles" class="tab-content"></div>
+  <div id="tab-map" class="tab-content"></div>
   <div id="tab-extras" class="tab-content"></div>
 </div>
-<footer style="text-align:center;padding:16px 20px;color:var(--text-dim);font-size:0.8em;border-top:1px solid var(--border);">
+<footer data-i18n="footer.generated_by">
   Generated by SatisFacts — Built by Physox
 </footer>
+<!-- Embedded data: gzip-compressed JSON, base64-encoded as text so it's
+     valid inside a script tag. Decoded by data.js using DecompressionStream.
+     The placeholders in the script tags below are replaced in GenerateHTML(). -->
 <script id="embedded-data" type="application/octet-stream">__EMBEDDED_DATA__</script>
-<script>__VIEWER_JS__</script>
+<script id="map-image" type="application/json">__MAP_IMAGE__</script>
+<script id="map-objects" type="application/octet-stream">__MAP_OBJECTS__</script>
+<script id="map-polylines" type="application/octet-stream">__MAP_POLYLINES__</script>
+<script id="viewer-js" type="application/octet-stream">__VIEWER_JS__</script>
+<script>
+(async function(){
+  var b64=document.getElementById('viewer-js').textContent;
+  var bin=atob(b64);
+  var bytes=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+  var ds=new DecompressionStream('gzip');
+  var blob=new Blob([bytes],{type:'application/gzip'});
+  var text=await new Response(blob.stream().pipeThrough(ds)).text();
+  eval(text);
+})();
+</script>
 </body>
 </html>`
 
 // ReportData is the data structure embedded in the HTML report.
 // It excludes the large "objects" array to keep the file size small.
+//
+// Many fields use interface{} because their structure is assembled dynamically
+// by the analytics pipeline (e.g. Analytics contains manufacturing, power, nuclear
+// sub-objects). Typed structs would require duplicating the analytics output shapes.
+// Fields with omitempty are only present in DEEP mode reports.
 type ReportData struct {
-	Header          map[string]interface{} `json:"header"`
-	Mode            string                 `json:"mode"`
-	TotalObjects    int                    `json:"totalObjects"`
-	TotalBuildings  int                    `json:"totalBuildings"`
-	ObjectsWritten  int                    `json:"objectsWritten"`
-	Buildings        map[string]int         `json:"buildings"`
-	Blueprints       map[string]int         `json:"blueprints,omitempty"`
-	Pets             interface{}            `json:"pets,omitempty"`
-	CreatureKills    interface{}            `json:"creatureKills,omitempty"`
-	Extraction      interface{}            `json:"extraction"`
-	Structures      interface{}            `json:"structures"`
-	Production      interface{}            `json:"production"`
-	PowerGridData   interface{}            `json:"powerGridData"`
-	GameProgression interface{}            `json:"gameProgression"`
-	Analytics       interface{}            `json:"analytics"`
-	Levels          interface{}            `json:"levels"`
-	SignDisplayNames map[string]string     `json:"signDisplayNames,omitempty"`
+	Header              map[string]interface{} `json:"header"`
+	Mode                string                 `json:"mode"` // always "DEEP"
+	TotalObjects        int                    `json:"totalObjects"`
+	TotalBuildings      int                    `json:"totalBuildings"`
+	ObjectsWritten      int                    `json:"objectsWritten"`
+	Buildings           map[string]int         `json:"buildings"`
+	Blueprints          map[string]int         `json:"blueprints,omitempty"`
+	Pets                interface{}            `json:"pets,omitempty"`
+	CreatureKills       interface{}            `json:"creatureKills,omitempty"`
+	ConsumablesConsumed interface{}            `json:"consumablesConsumed,omitempty"`
+	Logistics           interface{}            `json:"logistics,omitempty"`
+	Extraction          interface{}            `json:"extraction"`                   // raw extractor data (miners, wells)
+	Structures          interface{}            `json:"structures"`                   // foundation/wall/etc counts
+	Production          interface{}            `json:"production"`                   // production line data (belts, pipes)
+	PowerGridData       interface{}            `json:"powerGridData"`                // circuit and grid topology
+	GameProgression     interface{}            `json:"gameProgression"`              // milestones, MAM, space elevator
+	Analytics           interface{}            `json:"analytics"`                    // computed analytics (manufacturing, power, nuclear, etc.)
+	ItemDisplayNames    map[string]string      `json:"itemDisplayNames,omitempty"`   // class name -> display name (current language)
+	ItemDisplayNamesDe  map[string]string      `json:"itemDisplayNamesDe,omitempty"` // class name -> German display name
+	UIStrings           map[string]string      `json:"uiStrings,omitempty"`          // English UI strings
+	UIStringsDe         map[string]string      `json:"uiStringsDe,omitempty"`        // German UI strings
+	Icons               map[string]string      `json:"icons,omitempty"`              // class name -> base64 data URI
+	MapData             *MapData               `json:"mapData,omitempty"`            // compact map data for the map tab
+	MapColors           map[string]string      `json:"mapColors,omitempty"`          // custom map category colors (cat name -> hex)
 }
 
 // GenerateHTML creates a single-file interactive HTML report with embedded
-// compressed JSON data. The data is gzip-compressed and base64-encoded.
+// compressed JSON data. The data is gzip-compressed and base64-encoded so the
+// entire report (data + viewer JS) is in one self-contained .html file.
+//
+// The pipeline is: JSON marshal -> gzip -> base64 -> string replace into template.
+// We use string.Replace instead of fmt.Sprintf because the CSS contains %
+// characters that would be interpreted as format verbs.
 func GenerateHTML(report ReportData, outputPath string) error {
-	// Marshal report data to JSON
+	// Marshal report data to JSON (without icons first)
+	report.Icons = nil
 	jsonData, err := json.Marshal(report)
 	if err != nil {
 		return fmt.Errorf("marshalling report data: %w", err)
+	}
+
+	// Select only icons referenced in the report data
+	report.Icons = SelectIconsFromJSON(jsonData)
+	if len(report.Icons) > 0 {
+		jsonData, err = json.Marshal(report)
+		if err != nil {
+			return fmt.Errorf("re-marshalling report data with icons: %w", err)
+		}
 	}
 
 	// Gzip compress
@@ -491,10 +188,44 @@ func GenerateHTML(report ReportData, outputPath string) error {
 	// Base64 encode
 	encoded := base64.StdEncoding.EncodeToString(gzipBuf.Bytes())
 
-	// Build HTML — use string replacement instead of fmt.Sprintf to avoid
+	// Build HTML - use string replacement instead of fmt.Sprintf to avoid
 	// CSS percent signs being interpreted as format verbs.
 	html := strings.Replace(htmlTemplate, "__EMBEDDED_DATA__", encoded, 1)
-	html = strings.Replace(html, "__VIEWER_JS__", viewerJS, 1)
+	html = strings.Replace(html, "__MAP_IMAGE__", LoadMapImageBase64(mapWebP), 1)
+
+	// Embed map binary blobs as separate gzip-compressed base64 script tags.
+	// This bypasses the JSON pipeline for better compression on raw binary data.
+	mapObjB64 := ""
+	mapPolyB64 := ""
+	if report.MapData != nil {
+		if len(report.MapData.ObjectsBin) > 0 {
+			var objGzip bytes.Buffer
+			ogw := gzip.NewWriter(&objGzip)
+			if _, err := ogw.Write(report.MapData.ObjectsBin); err != nil {
+				return fmt.Errorf("gzip compressing map objects: %w", err)
+			}
+			if err := ogw.Close(); err != nil {
+				return fmt.Errorf("closing map objects gzip writer: %w", err)
+			}
+			mapObjB64 = base64.StdEncoding.EncodeToString(objGzip.Bytes())
+		}
+		if len(report.MapData.PolylinesBin) > 0 {
+			var polyGzip bytes.Buffer
+			pgw := gzip.NewWriter(&polyGzip)
+			if _, err := pgw.Write(report.MapData.PolylinesBin); err != nil {
+				return fmt.Errorf("gzip compressing map polylines: %w", err)
+			}
+			if err := pgw.Close(); err != nil {
+				return fmt.Errorf("closing map polylines gzip writer: %w", err)
+			}
+			mapPolyB64 = base64.StdEncoding.EncodeToString(polyGzip.Bytes())
+		}
+	}
+	html = strings.Replace(html, "__MAP_OBJECTS__", mapObjB64, 1)
+	html = strings.Replace(html, "__MAP_POLYLINES__", mapPolyB64, 1)
+
+	html = strings.Replace(html, "__CSS__", string(reportCSS), 1)
+	html = strings.Replace(html, "__VIEWER_JS__", loadViewerJS(), 1)
 
 	// Write to file
 	if err := os.WriteFile(outputPath, []byte(html), 0644); err != nil {
