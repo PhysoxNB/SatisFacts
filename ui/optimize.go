@@ -78,15 +78,21 @@ func (a *App) OptimizeSave(savePath, outputPath string) (result *OptimizeResultI
 		"total":   0,
 	})
 
-	// Cancellation is checked from inside the progress callback (once per level)
-	// rather than only around the call, so pressing Cancel aborts partway through
-	// instead of waiting out the whole sort on a multi-GB save.
+	// Cancellation is checked from inside the progress callback rather than only
+	// around the call, so pressing Cancel aborts partway through instead of waiting
+	// out the whole run on a multi-GB save.
 	optResult, err := editor.OptimizeSaveToFile(sd, outputPath, func(current, total int, _ string) error {
 		if err := checkCancel(); err != nil {
 			return err
 		}
+		phase := "optimizing"
+		if current >= total {
+			// The last chunk still has to be written and the file synced to disk.
+			// A total of 0 animates the bar instead of leaving it sitting full.
+			phase, current, total = "finishing", 0, 0
+		}
 		wailsruntime.EventsEmit(a.ctx, "optimize:progress", map[string]interface{}{
-			"phase":   "optimizing",
+			"phase":   phase,
 			"current": current,
 			"total":   total,
 		})

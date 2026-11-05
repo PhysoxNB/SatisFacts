@@ -80,6 +80,7 @@ export default {
     'analyze.phase.html': 'Generating HTML report...',
     'analyze.phase.done': 'Done!',
     'optimize.phase.optimizing': 'Optimizing levels...',
+    'optimize.phase.finishing': 'Finishing up...',
 
     'mult.label.mPartsCostMultiplier': 'Recipe Cost',
     'mult.label.mSpacePartsCostMultiplier': 'Space Elevator Cost',

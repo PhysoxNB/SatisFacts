@@ -741,6 +741,43 @@ func TestOptimizeSaveToFileCancelLeavesNothingBehind(t *testing.T) {
 	}
 }
 
+// Progress has to follow the bytes, not the level count: the persistent level comes
+// last and holds most of the data, so counting levels fills the bar right away.
+func TestOptimizeProgressFollowsBytes(t *testing.T) {
+	sd, err := LoadSave(fixture(t, fxHotbar))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var reports []int
+	wantTotal := len(sd.Decompressed)
+	_, err = OptimizeSaveToFile(sd, filepath.Join(t.TempDir(), "out.sav"), func(current, total int, _ string) error {
+		if total != wantTotal {
+			t.Fatalf("total = %d, want %d", total, wantTotal)
+		}
+		reports = append(reports, current)
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	midway := 0
+	for i, current := range reports {
+		if i > 0 && current < reports[i-1] {
+			t.Fatalf("progress went backwards: %d after %d", current, reports[i-1])
+		}
+		if current > wantTotal/10 && current < wantTotal/10*9 {
+			midway++
+		}
+	}
+	if midway < 50 {
+		t.Errorf("only %d of %d reports between 10%% and 90%%", midway, len(reports))
+	}
+	if last := reports[len(reports)-1]; last != wantTotal {
+		t.Errorf("last report = %d, want %d", last, wantTotal)
+	}
+}
+
 // objectSortKeys avoids full header parsing, so it has to agree with it exactly.
 func TestObjectSortKeysMatchParsedHeaders(t *testing.T) {
 	sd, err := LoadSave(fixture(t, fxHotbar))

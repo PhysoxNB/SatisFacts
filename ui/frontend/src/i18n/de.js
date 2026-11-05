@@ -80,6 +80,7 @@ export default {
     'analyze.phase.html': 'HTML-Report wird erstellt...',
     'analyze.phase.done': 'Fertig!',
     'optimize.phase.optimizing': 'Level werden optimiert...',
+    'optimize.phase.finishing': 'Wird abgeschlossen...',
 
     'mult.label.mPartsCostMultiplier': 'Rezeptkosten',
     'mult.label.mSpacePartsCostMultiplier': 'Weltraumaufzug-Kosten',

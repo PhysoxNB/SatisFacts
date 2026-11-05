@@ -33,7 +33,9 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: "1.27.x"
+          # Wails 2.13.0 fails on Go 1.27.2 and newer ("package fmt without types").
+          # Move this up together with the Wails upgrade.
+          go-version: "1.27.1"
           cache-dependency-path: ui/go.sum
 
       - uses: actions/setup-node@v4

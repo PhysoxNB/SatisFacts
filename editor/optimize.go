@@ -30,9 +30,11 @@ type OptimizeLevelStat struct {
 
 // OptimizeSave reorganizes objects by class name within each level for better
 // compression. It modifies sd.Decompressed in place and returns statistics.
-// The progress callback (if non-nil) is called with (currentLevel, totalLevels, phase)
-// before each level. Returning a non-nil error from it aborts the run and that
-// error is returned to the caller, which is how cancellation is wired up.
+// The progress callback (if non-nil) is called with (bytesWritten, totalBytes, phase)
+// before each level and about every 1% of the body, because one level usually holds
+// nearly all the data. current == total means the body is done. Returning a non-nil
+// error from it aborts the run and that error is returned to the caller, which is
+// how cancellation is wired up.
 //
 // This needs a full second copy of the body in memory. To write the result to a
 // file, use OptimizeSaveToFile, which doesn't.
@@ -83,12 +85,24 @@ func writeOptimizedBody(sd *SaveData, w io.Writer, progress func(current, total 
 
 	wpos := 0
 	var writeErr error
+	reportStep := len(sd.Decompressed) / 100
+	nextReport := reportStep
+	report := func() {
+		if progress == nil || writeErr != nil {
+			return
+		}
+		nextReport = wpos + reportStep
+		writeErr = progress(wpos, len(sd.Decompressed), "Optimizing levels...")
+	}
 	write := func(p []byte) {
 		if writeErr != nil {
 			return
 		}
 		_, writeErr = w.Write(p)
 		wpos += len(p)
+		if wpos >= nextReport {
+			report()
+		}
 	}
 	writeUint32 := func(v uint32) {
 		var b [4]byte
@@ -107,11 +121,11 @@ func writeOptimizedBody(sd *SaveData, w io.Writer, progress func(current, total 
 
 	levelStats := make([]OptimizeLevelStat, 0, len(levels))
 
-	for li, l := range levels {
-		if progress != nil {
-			if err := progress(li, len(levels), "Optimizing levels..."); err != nil {
-				return nil, err
-			}
+	for _, l := range levels {
+		// Sorting a big level writes nothing for a while, so check in before it.
+		report()
+		if writeErr != nil {
+			return nil, writeErr
 		}
 		shortName := l.Name
 		if l.IsPersistent {
@@ -213,6 +227,11 @@ func writeOptimizedBody(sd *SaveData, w io.Writer, progress func(current, total 
 
 	if wpos != len(sd.Decompressed) {
 		return nil, fmt.Errorf("optimize: wrote %d bytes but expected %d (body may be silently corrupted)", wpos, len(sd.Decompressed))
+	}
+
+	report()
+	if writeErr != nil {
+		return nil, writeErr
 	}
 
 	return &OptimizeResult{
